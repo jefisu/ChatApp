@@ -12,7 +12,7 @@ Chat app built with Jetpack Compose
 - Compose Destinations
 - Ktor
 - Coil
-- Navigation
+- WebSocket
 - Splash Screen
 
 ## Features
