@@ -5,5 +5,6 @@ import com.jefisu.chatapp.core.data.model.User
 data class HomeState(
     val ownerUser: User,
     val chats: List<ChatPreview>,
-    val users: List<User>
+    val users: List<User>,
+    val searchQuery: String
 )

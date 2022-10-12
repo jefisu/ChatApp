@@ -28,13 +28,12 @@ class HomeViewModel @Inject constructor(
     private val chatsFlow = chatUseCases.getChatsByUser(user)
     private val usersFlow = chatUseCases.getAllUsers(user.username)
     private val userFlow = savedStateHandle.getStateFlow("user", user)
+    private val searchQuery = savedStateHandle.getStateFlow("searchQuery", "")
 
-    val state = combine(chatsFlow, usersFlow, userFlow) { chats, users, curUser ->
-        val filteredUsers = users.filterIndexed { index, _ -> index < 10 }
-        HomeState(
-            users = filteredUsers,
-            ownerUser = curUser,
-            chats = chats.map { chat ->
+    val state =
+        combine(chatsFlow, usersFlow, userFlow, searchQuery) { chats, users, curUser, searchQuery ->
+            val filteredUsers = users.filterIndexed { index, _ -> index < 10 }
+            val curChats = chats.map { chat ->
                 val user = chat.users.first { it != curUser }
                 val lastMessage = chat.messages.firstOrNull()
                 ChatPreview(
@@ -44,9 +43,18 @@ class HomeViewModel @Inject constructor(
                     ownerSentLastMessage = curUser == user,
                     timeLastMessage = DateUtil.getLastMessageTime(lastMessage?.timestamp ?: 0L)
                 )
+            }.filter { chat ->
+                chat.lastMessage?.text?.contains(searchQuery, true) ?: false
+                        || chat.recipientUser.name?.contains(searchQuery, true) ?: false
+                        || chat.recipientUser.username.contains(searchQuery, true)
             }
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+            HomeState(
+                searchQuery = searchQuery,
+                users = filteredUsers,
+                ownerUser = curUser,
+                chats = curChats
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun getUser() {
         val username = prefs.getString("username", null) ?: user.username
@@ -56,8 +64,13 @@ class HomeViewModel @Inject constructor(
                 is Resource.Success -> {
                     savedStateHandle["user"] = result.data
                 }
+
                 is Resource.Error -> Unit
             }
         }
+    }
+
+    fun searchChats(query: String) {
+        savedStateHandle["searchQuery"] = query
     }
 }
