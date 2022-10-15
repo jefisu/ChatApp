@@ -66,9 +66,7 @@ class RegistrationViewModel @Inject constructor(
             )
             when (result) {
                 is Resource.Success -> {
-                    if (result.data != null) {
-                        _resultChannel.send(UiEvent.Navigate(HomeScreenDestination(result.data)))
-                    }
+                    _resultChannel.send(UiEvent.Navigate(HomeScreenDestination))
                 }
                 is Resource.Error -> {
                     state = state.copy(error = result.uiText)

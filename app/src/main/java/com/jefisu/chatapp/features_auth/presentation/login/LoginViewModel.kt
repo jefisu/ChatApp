@@ -48,7 +48,7 @@ class LoginViewModel @Inject constructor(
             val result = authUseCases.signIn(state.email, state.password)
             when (result) {
                 is Resource.Success -> {
-                    _resultChannel.send(UiEvent.Navigate(HomeScreenDestination(result.data!!)))
+                    _resultChannel.send(UiEvent.Navigate(HomeScreenDestination))
                 }
                 is Resource.Error -> {
                     state = state.copy(error = result.uiText)

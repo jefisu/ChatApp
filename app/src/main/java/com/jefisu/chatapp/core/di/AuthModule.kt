@@ -11,7 +11,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -21,10 +21,11 @@ object AuthModule {
     @Provides
     @ViewModelScoped
     fun provideAuthUseCases(
-        repository: AuthRepository
+        repository: AuthRepository,
+        prefs: SharedPreferences
     ) = AuthUseCases(
-        signIn = SignIn(repository),
-        signUp = SignUp(repository)
+        signIn = SignIn(repository, prefs),
+        signUp = SignUp(repository, prefs)
     )
 
     @Provides

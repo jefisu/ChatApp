@@ -1,6 +1,5 @@
 package com.jefisu.chatapp.features_profile.presentation.edit_profile
 
-import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val profileUseCase: ProfileUseCase,
-    private val prefs: SharedPreferences,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -74,9 +72,6 @@ class EditProfileViewModel @Inject constructor(
                 val result = profileUseCase.changeUserInfo(user)
                 when (result) {
                     is Resource.Success -> {
-                        prefs.edit()
-                            .putString("username", user.username)
-                            .apply()
                         _resultChannel.send(UiEvent.Navigate())
                     }
                     is Resource.Error -> {

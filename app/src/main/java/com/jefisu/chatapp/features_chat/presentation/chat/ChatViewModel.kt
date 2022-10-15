@@ -1,42 +1,37 @@
 package com.jefisu.chatapp.features_chat.presentation.chat
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
 import com.jefisu.chatapp.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val chatUseCases: ChatUseCases,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    var state by mutableStateOf(ChatState())
-        private set
 
     private val navArgs = savedStateHandle.navArgs<ChatNavArgs>()
 
-    fun getChat() {
-        navArgs.chatId?.let { id ->
-            chatUseCases.getChat(id)
-                .onEach { currentChat ->
-                    state = state.copy(
-                        messages = currentChat.messages,
-                        ownerUsername = navArgs.ownerUsername,
-                        recipientUser = currentChat.users.find { it.username != navArgs.ownerUsername }
-                    )
-                }.launchIn(viewModelScope)
-        }
-    }
+    private val messages = savedStateHandle.getStateFlow("messages", navArgs.messages)
+    private val messageText = savedStateHandle.getStateFlow("messageText", "")
+
+    val state = combine(messages, messageText) { messages, messageText ->
+        ChatState(
+            messages = messages,
+            ownerUsername = navArgs.ownerUsername,
+            recipientUsername = navArgs.recipientUsername,
+            recipientAvatarUrl = navArgs.recipientAvatarUrl,
+            messageText = messageText
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ChatState())
 
     fun connectChat() {
         viewModelScope.launch {
@@ -44,10 +39,10 @@ class ChatViewModel @Inject constructor(
                 chatUseCases.connectToChat(navArgs.ownerUsername, navArgs.recipientUsername)
             if (connected) {
                 chatUseCases.observeMessages().collect { message ->
-                    val newList = state.messages.toMutableList().apply {
+                    val newList = messages.value.toMutableList().apply {
                         add(0, message)
                     }
-                    state = state.copy(messages = newList)
+                    savedStateHandle["messages"] = newList
                 }
             }
         }
@@ -56,10 +51,10 @@ class ChatViewModel @Inject constructor(
     fun onEvent(event: ChatEvent) {
         when (event) {
             is ChatEvent.MessageTextChange -> {
-                state = state.copy(messageText = event.value)
+                savedStateHandle["messageText"] = event.value
             }
             is ChatEvent.ClearText -> {
-                state = state.copy(messageText = "")
+                savedStateHandle["messageText"] = ""
             }
             is ChatEvent.SendMessage -> sendMessage()
         }
@@ -73,9 +68,9 @@ class ChatViewModel @Inject constructor(
 
     private fun sendMessage() {
         viewModelScope.launch {
-            if (state.messageText.isNotBlank()) {
-                chatUseCases.sendMessage(state.messageText)
-                state = state.copy(messageText = "")
+            if (messageText.value.isNotBlank()) {
+                chatUseCases.sendMessage(messageText.value)
+                savedStateHandle["messageText"] = ""
             }
         }
     }

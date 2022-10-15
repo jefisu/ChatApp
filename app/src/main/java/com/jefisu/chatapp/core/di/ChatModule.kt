@@ -5,13 +5,21 @@ import com.jefisu.chatapp.features_chat.data.repository.ChatRepositoryImpl
 import com.jefisu.chatapp.features_chat.data.services.ChatSocketServiceImpl
 import com.jefisu.chatapp.features_chat.domain.repository.ChatRepository
 import com.jefisu.chatapp.features_chat.domain.services.ChatSocketService
-import com.jefisu.chatapp.features_chat.domain.use_cases.*
+import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
+import com.jefisu.chatapp.features_chat.domain.use_cases.ConnectToChat
+import com.jefisu.chatapp.features_chat.domain.use_cases.ExitChat
+import com.jefisu.chatapp.features_chat.domain.use_cases.GetAllUsers
+import com.jefisu.chatapp.features_chat.domain.use_cases.GetChat
+import com.jefisu.chatapp.features_chat.domain.use_cases.GetChatsByUser
+import com.jefisu.chatapp.features_chat.domain.use_cases.GetUser
+import com.jefisu.chatapp.features_chat.domain.use_cases.ObserveMessages
+import com.jefisu.chatapp.features_chat.domain.use_cases.SendMessage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 
 @Module
 @InstallIn(ViewModelComponent::class)

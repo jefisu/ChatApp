@@ -9,14 +9,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Singleton
 
 @Module
@@ -43,7 +44,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSharedRepository(client: HttpClient): SharedRepository {
-        return SharedRepositoryImpl(client)
+    fun provideSharedRepository(client: HttpClient, prefs: SharedPreferences): SharedRepository {
+        return SharedRepositoryImpl(client, prefs)
     }
 }

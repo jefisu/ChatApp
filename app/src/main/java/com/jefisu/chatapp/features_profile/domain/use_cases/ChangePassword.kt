@@ -1,6 +1,6 @@
 package com.jefisu.chatapp.features_profile.domain.use_cases
 
-import com.jefisu.chatapp.core.util.Resource
+import com.jefisu.chatapp.core.util.SimpleResource
 import com.jefisu.chatapp.core.util.requestCatch
 import com.jefisu.chatapp.features_profile.domain.model.Password
 import com.jefisu.chatapp.features_profile.domain.repository.ProfileRepository
@@ -10,7 +10,7 @@ class ChangePassword(
 ) {
     suspend operator fun invoke(
         request: Password
-    ): Resource<String> {
+    ): SimpleResource {
         return requestCatch {
             repository.changePassword(request)
         }

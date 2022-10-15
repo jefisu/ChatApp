@@ -38,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jefisu.chatapp.R
-import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.destinations.ChatScreenDestination
 import com.jefisu.chatapp.destinations.ProfileScreenDestination
@@ -65,21 +63,18 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalFoundationApi::class)
 @RootNavGraph
-@Destination(
-    style = CustomTransitions::class,
-    navArgsDelegate = User::class
-)
+@Destination(style = CustomTransitions::class,)
 @Composable
 fun HomeScreen(
     navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     var isSearching by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
         viewModel.getUser()
+        viewModel.loadChatsUsers()
     }
 
     state?.let { _state ->
@@ -108,7 +103,7 @@ fun HomeScreen(
                                 color = Platinum
                             )
                             Text(
-                                text = ownerUser.name ?: ownerUser.username,
+                                text = ownerUser?.name ?: ownerUser?.username.orEmpty(),
                                 color = Color.White,
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Medium
@@ -120,24 +115,26 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         ProfileImage(
-                            avatarUrl = ownerUser.avatarUrl,
+                            avatarUrl = ownerUser?.avatarUrl,
                             size = 47.dp,
                             onClick = {
-                                navigator.navigate(ProfileScreenDestination(ownerUser))
+                                navigator.navigate(ProfileScreenDestination())
                             }
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyRow {
-                        item {
-                            Spacer(modifier = Modifier.width(12.dp))
-                            UserItem(
-                                user = ownerUser,
-                                isFirstOwner = true,
-                                onClick = {}
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
+                        if (ownerUser != null) {
+                            item {
+                                Spacer(modifier = Modifier.width(12.dp))
+                                UserItem(
+                                    user = ownerUser,
+                                    isFirstOwner = true,
+                                    onClick = {}
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                            }
                         }
                         items(users) { user ->
                             UserItem(
@@ -148,9 +145,10 @@ fun HomeScreen(
                                     }
                                     navigator.navigate(
                                         ChatScreenDestination(
-                                            chatId = existChat?.id,
-                                            ownerUsername = ownerUser.username,
-                                            recipientUsername = user.username
+                                            ownerUsername = ownerUser?.username.orEmpty(),
+                                            recipientUsername = user.username ,
+                                            recipientAvatarUrl = user.avatarUrl,
+                                            messages = existChat?.messages ?: arrayListOf()
                                         )
                                     )
                                 }
@@ -234,9 +232,10 @@ fun HomeScreen(
                                 onNavigateClick = {
                                     navigator.navigate(
                                         ChatScreenDestination(
-                                            chat.id,
-                                            ownerUser.username,
-                                            chat.recipientUser.username
+                                            ownerUser?.username.orEmpty(),
+                                            chat.recipientUser.username,
+                                            chat.recipientUser.avatarUrl,
+                                            chat.messages
                                         )
                                     )
                                 },

@@ -13,6 +13,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +43,11 @@ class SplashViewModel @Inject constructor(
             }.also { result ->
                 when (result) {
                     is Resource.Success -> {
-                        _resultEvent.send(UiEvent.Navigate(HomeScreenDestination(result.data!!)))
+                        val parsedUser = Json.encodeToString(result.data!!)
+                        prefs.edit()
+                            .putString("user", parsedUser)
+                            .apply()
+                        _resultEvent.send(UiEvent.Navigate(HomeScreenDestination))
                     }
                     is Resource.Error -> {
                         _resultEvent.send(UiEvent.Navigate(LoginScreenDestination))

@@ -8,5 +8,6 @@ data class ChatPreview(
     val recipientUser: User,
     val lastMessage: Message?,
     val ownerSentLastMessage: Boolean,
-    val timeLastMessage: String
+    val timeLastMessage: String,
+    val messages: ArrayList<Message>
 )

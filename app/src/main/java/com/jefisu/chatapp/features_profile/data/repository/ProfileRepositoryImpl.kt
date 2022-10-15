@@ -6,12 +6,17 @@ import com.jefisu.chatapp.core.util.ChatConstants
 import com.jefisu.chatapp.features_profile.data.mapper.toPasswordDto
 import com.jefisu.chatapp.features_profile.domain.model.Password
 import com.jefisu.chatapp.features_profile.domain.repository.ProfileRepository
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
+import io.ktor.client.HttpClient
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.append
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.parameter
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.util.generateNonce
+import io.ktor.utils.io.core.writeFully
 
 class ProfileRepositoryImpl(
     private val client: HttpClient

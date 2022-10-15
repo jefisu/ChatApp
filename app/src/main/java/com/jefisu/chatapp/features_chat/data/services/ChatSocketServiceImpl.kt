@@ -5,11 +5,19 @@ import com.jefisu.chatapp.features_chat.data.dto.MessageDto
 import com.jefisu.chatapp.features_chat.data.mapper.toMessage
 import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.services.ChatSocketService
-import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
-import io.ktor.websocket.*
-import kotlinx.coroutines.flow.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.parameter
+import io.ktor.client.request.url
+import io.ktor.websocket.Frame
+import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -54,8 +62,7 @@ class ChatSocketServiceImpl(
                     val messageDto = Json.decodeFromString<MessageDto>(json)
                     messageDto.toMessage()
                 } ?: flowOf()
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             flowOf()
         }
     }

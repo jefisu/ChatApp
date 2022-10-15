@@ -3,7 +3,7 @@ package com.jefisu.chatapp.features_chat.core.util
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Locale
 
 object DateUtil {
     fun timeOfDay(): String {

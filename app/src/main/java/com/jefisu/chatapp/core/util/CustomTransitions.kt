@@ -1,10 +1,23 @@
 package com.jefisu.chatapp.core.util
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.navigation.NavBackStackEntry
 import com.jefisu.chatapp.appDestination
-import com.jefisu.chatapp.destinations.*
+import com.jefisu.chatapp.destinations.ChatScreenDestination
+import com.jefisu.chatapp.destinations.EditPasswordScreenDestination
+import com.jefisu.chatapp.destinations.EditProfileScreenDestination
+import com.jefisu.chatapp.destinations.HomeScreenDestination
+import com.jefisu.chatapp.destinations.LoginScreenDestination
+import com.jefisu.chatapp.destinations.ProfileScreenDestination
+import com.jefisu.chatapp.destinations.RegistrationScreenDestination
 import com.ramcosta.composedestinations.spec.DestinationStyle
 
 @OptIn(ExperimentalAnimationApi::class)

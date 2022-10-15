@@ -1,8 +1,8 @@
 package com.jefisu.chatapp.core.util
 
 import com.jefisu.chatapp.R
-import io.ktor.client.plugins.*
-import io.ktor.client.statement.*
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.statement.bodyAsText
 import java.io.IOException
 
 suspend inline fun <T> requestCatch(

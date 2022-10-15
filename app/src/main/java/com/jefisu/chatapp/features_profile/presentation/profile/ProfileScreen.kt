@@ -1,7 +1,14 @@
 package com.jefisu.chatapp.features_profile.presentation.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -24,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jefisu.chatapp.R
-import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
 import com.jefisu.chatapp.destinations.EditPasswordScreenDestination
@@ -39,7 +45,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @RootNavGraph
-@Destination(navArgsDelegate = User::class, style = CustomTransitions::class)
+@Destination(style = CustomTransitions::class)
 @Composable
 fun ProfileScreen(
     navigator: DestinationsNavigator,
@@ -61,6 +67,7 @@ fun ProfileScreen(
                         navigator.navigateUp()
                     }
                 }
+
                 is UiEvent.ShowBottomSheet -> Unit
             }
         }
@@ -111,24 +118,24 @@ fun ProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ProfileImage(
-                        avatarUrl = user.avatarUrl,
+                        avatarUrl = user?.avatarUrl,
                         size = 120.dp
                     )
                     Text(
-                        text = user.name ?: user.username,
+                        text = user?.name ?: user?.username.orEmpty(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.White
                     )
                     Text(
-                        text = "@${user.username}",
+                        text = "@${user?.username}",
                         fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
                         color = Color.White
                     )
                 }
                 IconButton(
-                    onClick = { navigator.navigate(EditProfileScreenDestination(user)) },
+                    onClick = { navigator.navigate(EditProfileScreenDestination(user!!)) },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Icon(
@@ -144,14 +151,14 @@ fun ProfileScreen(
                 icon = R.drawable.ic_change_password,
                 text = stringResource(R.string.change_password),
                 onClick = {
-                    navigator.navigate(EditPasswordScreenDestination(user.username))
+                    navigator.navigate(EditPasswordScreenDestination(user?.username.orEmpty()))
                 }
             )
             Spacer(modifier = Modifier.height(24.dp))
             ButtonOption(
                 icon = R.drawable.ic_exit_account,
                 text = stringResource(R.string.logout),
-                onClick = { viewModel.onEvent(ProfileEvent.Logout) }
+                onClick = viewModel::logout
             )
         }
     }
