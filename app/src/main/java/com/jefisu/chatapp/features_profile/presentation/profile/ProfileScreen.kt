@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.jefisu.chatapp.R
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
@@ -42,13 +43,12 @@ import com.jefisu.chatapp.ui.theme.EbonyClay
 import com.jefisu.chatapp.ui.theme.Gunmetal
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @RootNavGraph
 @Destination(style = CustomTransitions::class)
 @Composable
 fun ProfileScreen(
-    navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
@@ -62,12 +62,10 @@ fun ProfileScreen(
             when (event) {
                 is UiEvent.Navigate -> {
                     if (event.destination != null) {
-                        navigator.navigate(event.destination)
-                    } else {
-                        navigator.navigateUp()
+                        navController.backQueue.clear()
+                        navController.navigate(event.destination.route)
                     }
                 }
-
                 is UiEvent.ShowBottomSheet -> Unit
             }
         }
@@ -93,7 +91,7 @@ fun ProfileScreen(
             ) {
                 CustomIconButton(
                     icon = Icons.Default.ArrowBack,
-                    onClick = navigator::navigateUp
+                    onClick = navController::navigateUp
                 )
                 Text(
                     text = stringResource(R.string.profile),
@@ -135,7 +133,7 @@ fun ProfileScreen(
                     )
                 }
                 IconButton(
-                    onClick = { navigator.navigate(EditProfileScreenDestination(user!!)) },
+                    onClick = { navController.navigate(EditProfileScreenDestination(user!!).route) },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Icon(
@@ -151,7 +149,7 @@ fun ProfileScreen(
                 icon = R.drawable.ic_change_password,
                 text = stringResource(R.string.change_password),
                 onClick = {
-                    navigator.navigate(EditPasswordScreenDestination(user?.username.orEmpty()))
+                    navController.navigate(EditPasswordScreenDestination(user?.username.orEmpty()).route)
                 }
             )
             Spacer(modifier = Modifier.height(24.dp))
