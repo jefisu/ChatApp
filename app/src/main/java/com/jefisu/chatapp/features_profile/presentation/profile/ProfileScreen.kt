@@ -36,6 +36,7 @@ import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
 import com.jefisu.chatapp.destinations.EditPasswordScreenDestination
 import com.jefisu.chatapp.destinations.EditProfileScreenDestination
+import com.jefisu.chatapp.destinations.LoginScreenDestination
 import com.jefisu.chatapp.features_chat.core.components.CustomIconButton
 import com.jefisu.chatapp.features_chat.core.components.ProfileImage
 import com.jefisu.chatapp.features_profile.presentation.profile.components.ButtonOption
@@ -61,7 +62,7 @@ fun ProfileScreen(
         viewModel.resultEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> {
-                    if (event.destination != null) {
+                    if (event.destination == LoginScreenDestination) {
                         navController.backQueue.clear()
                         navController.navigate(event.destination.route)
                     }
