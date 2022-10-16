@@ -17,19 +17,19 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.jefisu.chatapp.R
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
 @RootNavGraph(start = true)
 @Destination(style = CustomTransitions::class)
 @Composable
 fun SplashScreen(
-    navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
     var startAnimation by remember { mutableStateOf(false) }
@@ -42,9 +42,9 @@ fun SplashScreen(
         viewModel.resultEvent.collect { event ->
             if (event is UiEvent.Navigate) {
                 delay(500L)
-                navigator.apply {
-                    popBackStack()
-                    event.destination?.let { navigate(it) }
+                navController.apply {
+                    backQueue.clear()
+                    event.destination?.let { navigate(it.route) }
                 }
             }
         }

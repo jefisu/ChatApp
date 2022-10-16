@@ -18,18 +18,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.jefisu.chatapp.R
 import com.jefisu.chatapp.core.presentation.components.BottomSheet
 import com.jefisu.chatapp.core.presentation.components.CustomButton
 import com.jefisu.chatapp.core.presentation.components.CustomTextField
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
-import com.jefisu.chatapp.destinations.LoginScreenDestination
 import com.jefisu.chatapp.ui.theme.GhostWhite
 import com.jefisu.chatapp.ui.theme.QuickSilver
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -39,7 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 fun RegistrationScreen(
     scope: CoroutineScope,
     sheetState: ModalBottomSheetState,
-    navigator: DestinationsNavigator,
+    navController: NavController,
     viewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
@@ -48,10 +47,9 @@ fun RegistrationScreen(
         viewModel.resultEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> {
-                    navigator.apply {
-                        clearBackStack(LoginScreenDestination)
-                        popBackStack()
-                        event.destination?.let { navigate(it) }
+                    navController.apply {
+                        backQueue.clear()
+                        event.destination?.let { navigate(it.route) }
                     }
                 }
                 is UiEvent.ShowBottomSheet -> {
