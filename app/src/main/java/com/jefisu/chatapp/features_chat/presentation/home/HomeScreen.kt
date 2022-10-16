@@ -60,21 +60,29 @@ import com.jefisu.chatapp.ui.theme.Woodsmoke
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.NavResult
+import com.ramcosta.composedestinations.result.ResultRecipient
 
 @OptIn(ExperimentalFoundationApi::class)
 @RootNavGraph
-@Destination(style = CustomTransitions::class,)
+@Destination(style = CustomTransitions::class)
 @Composable
 fun HomeScreen(
     navigator: DestinationsNavigator,
+    resultRecipient: ResultRecipient<ChatScreenDestination, HomeNavArg>,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     var isSearching by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
-        viewModel.getUser()
-        viewModel.loadChatsUsers()
+        viewModel.getUsers()
+    }
+
+    resultRecipient.onNavResult { result ->
+        if (result is NavResult.Value) {
+            viewModel.updateMessageByCurrentChat(result.value.chatId, result.value.messages)
+        }
     }
 
     state?.let { _state ->
@@ -145,8 +153,9 @@ fun HomeScreen(
                                     }
                                     navigator.navigate(
                                         ChatScreenDestination(
+                                            chatId = existChat?.id,
                                             ownerUsername = ownerUser?.username.orEmpty(),
-                                            recipientUsername = user.username ,
+                                            recipientUsername = user.username,
                                             recipientAvatarUrl = user.avatarUrl,
                                             messages = existChat?.messages ?: arrayListOf()
                                         )
@@ -232,10 +241,11 @@ fun HomeScreen(
                                 onNavigateClick = {
                                     navigator.navigate(
                                         ChatScreenDestination(
-                                            ownerUser?.username.orEmpty(),
-                                            chat.recipientUser.username,
-                                            chat.recipientUser.avatarUrl,
-                                            chat.messages
+                                            chatId = chat.id,
+                                            ownerUsername = ownerUser?.username.orEmpty(),
+                                            recipientUsername = chat.recipientUser.username,
+                                            recipientAvatarUrl = chat.recipientUser.avatarUrl,
+                                            messages = chat.messages
                                         )
                                     )
                                 },

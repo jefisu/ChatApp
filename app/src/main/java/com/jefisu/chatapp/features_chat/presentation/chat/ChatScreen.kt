@@ -40,7 +40,9 @@ import com.jefisu.chatapp.features_chat.core.components.ChatTextField
 import com.jefisu.chatapp.features_chat.core.components.CustomIconButton
 import com.jefisu.chatapp.features_chat.core.components.ProfileImage
 import com.jefisu.chatapp.features_chat.core.util.DateUtil
+import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.presentation.chat.components.ChatBubble
+import com.jefisu.chatapp.features_chat.presentation.home.HomeNavArg
 import com.jefisu.chatapp.ui.theme.CoolGrey
 import com.jefisu.chatapp.ui.theme.Gunmetal
 import com.jefisu.chatapp.ui.theme.OuterSpace
@@ -48,7 +50,7 @@ import com.jefisu.chatapp.ui.theme.QuickSilver
 import com.jefisu.chatapp.ui.theme.Woodsmoke
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 @RootNavGraph
 @Destination(
@@ -58,7 +60,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ChatScreen(
     lifecycle: Lifecycle,
-    navigator: DestinationsNavigator,
+    resultBackNavigator: ResultBackNavigator<HomeNavArg>,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     DisposableEffect(key1 = lifecycle) {
@@ -78,7 +80,6 @@ fun ChatScreen(
     val state by viewModel.state.collectAsState()
     val messagesMap = state.messages.groupBy { DateUtil.getDateExt(it.timestamp) }
 
-
     Column(
         modifier = Modifier
             .background(Gunmetal)
@@ -92,7 +93,11 @@ fun ChatScreen(
         ) {
             CustomIconButton(
                 icon = Icons.Default.ArrowBack,
-                onClick = navigator::navigateUp
+                onClick = {
+                    resultBackNavigator.navigateBack(
+                        HomeNavArg(state.chatId, state.messages as ArrayList<Message>)
+                    )
+                }
             )
             Text(
                 text = state.recipientUsername,

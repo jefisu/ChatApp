@@ -57,30 +57,45 @@ class HomeViewModel @Inject constructor(
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    fun loadChatsUsers() {
+    init {
+        getUsers()
+        loadChatsUsers()
+    }
+
+    private fun loadChatsUsers() {
         viewModelScope.launch {
             ownerUser.value?.let {
-                launch {
-                    savedStateHandle["chats"] = chatUseCases.getChatsByUser(it)
-                }
-                launch {
-                    savedStateHandle["users"] = chatUseCases.getAllUsers(it.username)
-                }
+                savedStateHandle["chats"] = chatUseCases.getChatsByUser(it)
             }
         }
     }
 
-    fun getUser() {
+    fun getUsers() {
         viewModelScope.launch {
             val parsedUser = prefs.getString("user", null)
             parsedUser?.let { json ->
-                val user = Json.decodeFromString<User>(json)
-                savedStateHandle["user"] = user
+                val ownerUser = Json.decodeFromString<User>(json)
+                savedStateHandle["user"] = ownerUser
+                savedStateHandle["users"] = chatUseCases.getAllUsers(ownerUser.username)
             }
         }
     }
 
     fun searchChats(query: String) {
         savedStateHandle["searchQuery"] = query
+    }
+
+    fun updateMessageByCurrentChat(chatId: String?, messages: List<Message>) {
+        if (chatId == null) {
+            loadChatsUsers()
+            return
+        }
+        savedStateHandle["chats"] = chats.value.toMutableList().apply {
+            replaceAll {
+                if (it.id == chatId) {
+                    it.copy(messages = messages)
+                } else it
+            }
+        }
     }
 }

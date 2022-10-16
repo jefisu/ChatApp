@@ -25,6 +25,7 @@ class ChatViewModel @Inject constructor(
 
     val state = combine(messages, messageText) { messages, messageText ->
         ChatState(
+            chatId = navArgs.chatId,
             messages = messages,
             ownerUsername = navArgs.ownerUsername,
             recipientUsername = navArgs.recipientUsername,
