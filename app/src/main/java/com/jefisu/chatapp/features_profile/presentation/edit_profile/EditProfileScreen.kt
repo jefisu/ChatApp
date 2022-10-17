@@ -15,6 +15,7 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +40,7 @@ import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.core.util.UiEvent
 import com.jefisu.chatapp.features_chat.core.components.CustomIconButton
 import com.jefisu.chatapp.features_chat.core.components.ProfileImage
+import com.jefisu.chatapp.ui.theme.VampireBlack
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -107,7 +109,12 @@ fun EditProfileScreen(
                 avatarUrl = uriFile?.toString() ?: user.avatarUrl,
                 size = 130.dp,
                 onClick = { launcher.launch("image/*") },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                iconCorner = Icons.Default.CameraAlt,
+                iconCornerBackground = VampireBlack,
+                iconCornerSpace = 0.dp,
+                iconCornerSize = 24.dp,
+                iconCornerBackgroundSize = 40.dp
             )
             Spacer(modifier = Modifier.height(32.dp))
             CustomTextField(

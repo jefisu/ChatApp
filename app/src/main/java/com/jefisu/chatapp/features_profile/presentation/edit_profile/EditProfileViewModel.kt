@@ -32,6 +32,14 @@ class EditProfileViewModel @Inject constructor(
     private val _resultChannel = Channel<UiEvent>()
     val resultEvent = _resultChannel.receiveAsFlow()
 
+    init {
+        state = state.copy(
+            name = navArgUser.name.orEmpty(),
+            username = navArgUser.username,
+            email = navArgUser.email
+        )
+    }
+
     fun onEvent(event: EditProfileEvent) {
         when (event) {
             is EditProfileEvent.EnteredName -> {
