@@ -27,9 +27,8 @@ class ChatViewModel @Inject constructor(
         ChatState(
             chatId = navArgs.chatId,
             messages = messages,
-            ownerUsername = navArgs.ownerUsername,
-            recipientUsername = navArgs.recipientUsername,
-            recipientAvatarUrl = navArgs.recipientAvatarUrl,
+            ownerId = navArgs.ownerId,
+            recipientUser = navArgs.recipientUser,
             messageText = messageText
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ChatState())
@@ -37,7 +36,7 @@ class ChatViewModel @Inject constructor(
     fun connectChat() {
         viewModelScope.launch {
             val connected =
-                chatUseCases.connectToChat(navArgs.ownerUsername, navArgs.recipientUsername)
+                chatUseCases.connectToChat(navArgs.ownerId, navArgs.recipientUser.id)
             if (connected) {
                 chatUseCases.observeMessages().collect { message ->
                     val newList = messages.value.toMutableList().apply {

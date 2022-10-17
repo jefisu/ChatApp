@@ -100,7 +100,7 @@ fun ChatScreen(
                 }
             )
             Text(
-                text = state.recipientUsername,
+                text = state.recipientUser?.username.orEmpty(),
                 color = Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Medium,
@@ -108,7 +108,7 @@ fun ChatScreen(
                 modifier = Modifier.weight(1f)
             )
             ProfileImage(
-                avatarUrl = state.recipientAvatarUrl,
+                avatarUrl = state.recipientUser?.avatarUrl,
                 size = 47.dp
             )
         }
@@ -131,7 +131,7 @@ fun ChatScreen(
             ) {
                 messagesMap.forEach { (_, messages) ->
                     items(messages) { message ->
-                        val isOwnMessage = message.username == state.ownerUsername
+                        val isOwnMessage = message.userId == state.ownerId
                         ChatBubble(
                             message = message.text,
                             time = DateUtil.toHour(message.timestamp),

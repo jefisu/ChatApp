@@ -6,7 +6,7 @@ import com.jefisu.chatapp.features_chat.domain.model.Message
 fun MessageDto.toMessage(): Message {
     return Message(
         text = text,
-        username = username,
+        userId = userId,
         id = id,
         timestamp = timestamp
     )

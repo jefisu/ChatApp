@@ -1,13 +1,13 @@
 package com.jefisu.chatapp.features_chat.presentation.chat
 
+import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.features_chat.domain.model.Message
 
 data class ChatState(
     val chatId: String? = null,
     val messages: List<Message> = emptyList(),
-    val ownerUsername: String = "",
-    val recipientUsername: String = "",
-    val recipientAvatarUrl: String? = null,
+    val ownerId: String = "",
+    val recipientUser: User? = null,
     val messageText: String = "",
     val isBlankText: Boolean = messageText.isBlank()
 )

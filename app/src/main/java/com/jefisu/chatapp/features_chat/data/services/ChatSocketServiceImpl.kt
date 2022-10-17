@@ -29,14 +29,14 @@ class ChatSocketServiceImpl(
     private var socket: WebSocketSession? = null
 
     override suspend fun initSession(
-        senderUsername: String,
-        recipientUsername: String
+        senderId: String,
+        recipientId: String
     ): Boolean {
         return try {
             socket = client.webSocketSession {
                 url("${ChatConstants.WS_BASE_URL}/chat-socket")
-                parameter("sender", senderUsername)
-                parameter("recipient", recipientUsername)
+                parameter("senderId", senderId)
+                parameter("recipientId", recipientId)
             }
             socket?.isActive == true
         } catch (e: Exception) {

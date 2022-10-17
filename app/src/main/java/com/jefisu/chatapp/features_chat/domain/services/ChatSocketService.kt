@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface ChatSocketService {
 
     suspend fun initSession(
-        senderUsername: String,
-        recipientUsername: String
+        senderId: String,
+        recipientId: String
     ): Boolean
 
     suspend fun sendMessage(message: String)

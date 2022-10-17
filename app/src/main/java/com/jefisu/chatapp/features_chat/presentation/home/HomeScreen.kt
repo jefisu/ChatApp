@@ -154,9 +154,8 @@ fun HomeScreen(
                                     navigator.navigate(
                                         ChatScreenDestination(
                                             chatId = existChat?.id,
-                                            ownerUsername = ownerUser?.username.orEmpty(),
-                                            recipientUsername = user.username,
-                                            recipientAvatarUrl = user.avatarUrl,
+                                            ownerId = ownerUser?.id.orEmpty(),
+                                            recipientUser = user,
                                             messages = existChat?.messages ?: arrayListOf()
                                         )
                                     )
@@ -242,9 +241,8 @@ fun HomeScreen(
                                     navigator.navigate(
                                         ChatScreenDestination(
                                             chatId = chat.id,
-                                            ownerUsername = ownerUser?.username.orEmpty(),
-                                            recipientUsername = chat.recipientUser.username,
-                                            recipientAvatarUrl = chat.recipientUser.avatarUrl,
+                                            ownerId = ownerUser?.id.orEmpty(),
+                                            recipientUser = chat.recipientUser,
                                             messages = chat.messages
                                         )
                                     )
