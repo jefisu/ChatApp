@@ -24,19 +24,19 @@ object CustomTransitions : DestinationStyle.Animated {
     override fun AnimatedContentScope<NavBackStackEntry>.enterTransition(): EnterTransition? {
         return when (targetState.appDestination()) {
             LoginScreenDestination -> {
-                slideInVertically { 300 } + fadeIn(tween(700))
+                slideInVertically { 300 } + fadeIn(tween(900))
             }
             HomeScreenDestination -> {
-                scaleIn(tween(300)) + fadeIn(tween(700))
+                scaleIn(tween(300)) + fadeIn(tween(900))
             }
-            else -> fadeIn() + slideInHorizontally { it / 4 }
+            else -> slideInHorizontally { it - 900 } + fadeIn(tween(150))
         }
     }
 
     override fun AnimatedContentScope<NavBackStackEntry>.exitTransition(): ExitTransition? {
         return when (targetState.appDestination()) {
             in listOf(LoginScreenDestination, HomeScreenDestination) -> null
-            else -> fadeOut() + slideOutHorizontally { -it / 4 }
+            else -> slideOutHorizontally { -it + 900 } + fadeOut(tween(durationMillis = 150))
         }
     }
 
@@ -46,7 +46,7 @@ object CustomTransitions : DestinationStyle.Animated {
                 LoginScreenDestination,
                 HomeScreenDestination,
                 ProfileScreenDestination
-            ) -> fadeIn() + slideInHorizontally { -it / 4 }
+            ) -> slideInHorizontally { -it + 900 } + fadeIn(tween(durationMillis = 150))
             else -> null
         }
     }
@@ -57,7 +57,7 @@ object CustomTransitions : DestinationStyle.Animated {
                 LoginScreenDestination,
                 HomeScreenDestination,
                 ProfileScreenDestination
-            ) -> fadeOut() + slideOutHorizontally { it / 4 }
+            ) -> slideOutHorizontally { it - 900 } + fadeOut(tween(durationMillis = 150))
             else -> null
         }
     }
