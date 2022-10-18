@@ -34,20 +34,21 @@ class HomeViewModel @Inject constructor(
         combine(chats, users, ownerUser, searchQuery) { chats, users, curUser, searchQuery ->
             val filteredUsers = users.filterIndexed { index, _ -> index < 10 }
             val curChats = chats.map { chat ->
-                val user = chat.users.first { it != curUser }
+                val userId = chat.userIds.find { it != curUser?.id }
+                val user = users.find { it.id == userId }
                 val lastMessage = chat.messages.firstOrNull()
                 ChatPreview(
                     id = chat.id,
                     recipientUser = user,
                     lastMessage = lastMessage,
-                    ownerSentLastMessage = curUser == user,
+                    ownerSentLastMessage = curUser?.id == user?.id,
                     timeLastMessage = DateUtil.getLastMessageTime(lastMessage?.timestamp ?: 0L),
                     messages = chat.messages.toMutableList() as ArrayList<Message>
                 )
             }.filter { chat ->
                 chat.lastMessage?.text?.contains(searchQuery, true) ?: false
-                        || chat.recipientUser.name?.contains(searchQuery, true) ?: false
-                        || chat.recipientUser.username.contains(searchQuery, true)
+                        || chat.recipientUser?.name?.contains(searchQuery, true) ?: false
+                        || chat.recipientUser?.username?.contains(searchQuery, true) ?: false
             }
             HomeState(
                 searchQuery = searchQuery,
@@ -65,7 +66,7 @@ class HomeViewModel @Inject constructor(
     private fun loadChatsUsers() {
         viewModelScope.launch {
             ownerUser.value?.let {
-                savedStateHandle["chats"] = chatUseCases.getChatsByUser(it)
+                savedStateHandle["chats"] = chatUseCases.getChatsByUser(it.id)
             }
         }
     }

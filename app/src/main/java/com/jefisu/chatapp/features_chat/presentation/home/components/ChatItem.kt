@@ -55,7 +55,7 @@ fun ChatItem(
             .then(modifier)
     ) {
         ProfileImage(
-            avatarUrl = chat.recipientUser.avatarUrl,
+            avatarUrl = chat.recipientUser?.avatarUrl,
             onClick = onClickImage
         )
         Spacer(modifier = Modifier.width(16.dp))
@@ -68,7 +68,7 @@ fun ChatItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = chat.recipientUser.username,
+                    text = chat.recipientUser?.username.orEmpty(),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium

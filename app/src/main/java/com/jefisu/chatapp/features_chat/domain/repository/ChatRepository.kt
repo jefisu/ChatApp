@@ -5,7 +5,7 @@ import com.jefisu.chatapp.features_chat.domain.model.Chat
 
 interface ChatRepository {
 
-    suspend fun chatsByUser(user: User): List<Chat>
+    suspend fun chatsByUser(userId: String): List<Chat>
 
     suspend fun getChat(chatId: String): Chat
 

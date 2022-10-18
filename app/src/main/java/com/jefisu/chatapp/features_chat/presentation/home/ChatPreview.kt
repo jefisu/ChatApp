@@ -5,7 +5,7 @@ import com.jefisu.chatapp.features_chat.domain.model.Message
 
 data class ChatPreview(
     val id: String,
-    val recipientUser: User,
+    val recipientUser: User?,
     val lastMessage: Message?,
     val ownerSentLastMessage: Boolean,
     val timeLastMessage: String,

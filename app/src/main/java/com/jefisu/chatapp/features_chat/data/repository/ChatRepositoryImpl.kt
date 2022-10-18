@@ -21,10 +21,10 @@ class ChatRepositoryImpl(
     private val client: HttpClient
 ) : ChatRepository {
 
-    override suspend fun chatsByUser(user: User): List<Chat> {
+    override suspend fun chatsByUser(userId: String): List<Chat> {
         val response = client.post {
             url("${ChatConstants.BASE_URL}/chats")
-            setBody(user.toUserDto())
+            parameter("userId", userId)
         }
         val chats = response.body<List<ChatDto>>()
         return chats.map { it.toChat() }

@@ -9,6 +9,6 @@ import kotlinx.parcelize.Parcelize
 data class ChatNavArgs(
     val chatId: String?,
     val ownerId: String,
-    val recipientUser: User,
+    val recipientUser: User?,
     val messages: ArrayList<Message>
 ) : Parcelable

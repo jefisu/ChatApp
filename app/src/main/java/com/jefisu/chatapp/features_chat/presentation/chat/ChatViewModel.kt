@@ -36,7 +36,7 @@ class ChatViewModel @Inject constructor(
     fun connectChat() {
         viewModelScope.launch {
             val connected =
-                chatUseCases.connectToChat(navArgs.ownerId, navArgs.recipientUser.id)
+                chatUseCases.connectToChat(navArgs.ownerId, navArgs.recipientUser!!.id)
             if (connected) {
                 chatUseCases.observeMessages().collect { message ->
                     val newList = messages.value.toMutableList().apply {
