@@ -94,9 +94,7 @@ class EditProfileViewModel @Inject constructor(
                 state.avatarStream?.let {
                     val result = profileUseCase.changeAvatar(user, it.readBytes())
                     when (result) {
-                        is Resource.Success -> {
-                            _resultChannel.send(UiEvent.Navigate())
-                        }
+                        is Resource.Success -> Unit
                         is Resource.Error -> {
                             _resultChannel.send(UiEvent.ShowBottomSheet)
                             state = state.copy(
