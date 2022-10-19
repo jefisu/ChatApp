@@ -10,4 +10,6 @@ interface ChatRepository {
     suspend fun getChat(chatId: String): Chat
 
     suspend fun getAllUsers(ownerUsername: String): List<User>
+
+    suspend fun deleteChat(chatId: String): String
 }

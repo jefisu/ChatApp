@@ -5,6 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -27,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.twotone.Delete
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,9 +81,14 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var isSearching by remember { mutableStateOf(false) }
+    var isSelectionChatEnabled by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = true, key2 = state?.selectedChats) {
         viewModel.getUsers()
+        if (state?.selectedChats?.isEmpty() == true) {
+            isSelectionChatEnabled = false
+            viewModel.clearSelection()
+        }
     }
 
     resultRecipient.onNavResult { result ->
@@ -86,15 +98,10 @@ fun HomeScreen(
     }
 
     state?.let { _state ->
-        val ownerUser = _state.ownerUser
-        val chats = _state.chats
-        val users = _state.users
-        val searchQuery = _state.searchQuery
-
         Column(
             modifier = Modifier.background(Gunmetal)
         ) {
-            AnimatedVisibility(visible = !isSearching) {
+            AnimatedVisibility(visible = !isSearching && !isSelectionChatEnabled) {
                 Column {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -111,7 +118,8 @@ fun HomeScreen(
                                 color = Platinum
                             )
                             Text(
-                                text = ownerUser?.name ?: ownerUser?.username.orEmpty(),
+                                text = _state.ownerUser?.name
+                                    ?: _state.ownerUser?.username.orEmpty(),
                                 color = Color.White,
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Medium
@@ -123,7 +131,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         ProfileImage(
-                            avatarUrl = ownerUser?.avatarUrl,
+                            avatarUrl = _state.ownerUser?.avatarUrl,
                             size = 47.dp,
                             onClick = {
                                 navigator.navigate(ProfileScreenDestination())
@@ -133,28 +141,28 @@ fun HomeScreen(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyRow {
-                        if (ownerUser != null) {
+                        if (_state.ownerUser != null) {
                             item {
                                 Spacer(modifier = Modifier.width(12.dp))
                                 UserItem(
-                                    user = ownerUser,
+                                    user = _state.ownerUser,
                                     isFirstOwner = true,
                                     onClick = {}
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                             }
                         }
-                        items(users) { user ->
+                        items(_state.users) { user ->
                             UserItem(
                                 user = user,
                                 onClick = {
-                                    val existChat = chats.find {
+                                    val existChat = _state.chats.find {
                                         it.recipientUser == user
                                     }
                                     navigator.navigate(
                                         ChatScreenDestination(
                                             chatId = existChat?.id,
-                                            ownerId = ownerUser?.id.orEmpty(),
+                                            ownerId = _state.ownerUser?.id.orEmpty(),
                                             recipientUser = user,
                                             messages = existChat?.messages ?: arrayListOf()
                                         )
@@ -169,7 +177,7 @@ fun HomeScreen(
             }
             AnimatedVisibility(visible = isSearching) {
                 TextField(
-                    value = searchQuery,
+                    value = _state.searchQuery,
                     onValueChange = viewModel::searchChats,
                     singleLine = true,
                     placeholder = { Text(text = "Search...", fontSize = 20.sp) },
@@ -187,7 +195,7 @@ fun HomeScreen(
                         }
                     },
                     trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
+                        if (_state.searchQuery.isNotEmpty()) {
                             IconButton(onClick = { viewModel.searchChats("") }) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
@@ -210,6 +218,46 @@ fun HomeScreen(
                         .padding(6.dp)
                 )
             }
+            AnimatedVisibility(visible = isSelectionChatEnabled) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    IconButton(onClick = {
+                        isSelectionChatEnabled = false
+                        viewModel.clearSelection()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear selection chats",
+                            tint = Color.White
+                        )
+                    }
+                    Text(
+                        text = "${_state.selectedChats.size} selected",
+                        fontSize = 22.sp,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Checkbox(
+                        checked = _state.selectedChats.size == _state.chats.size,
+                        onCheckedChange = { viewModel.selectAll() },
+                        colors = CheckboxDefaults.colors(
+                            uncheckedColor = Color.White
+                        )
+                    )
+                    IconButton(onClick = viewModel::deleteChat) {
+                        Icon(
+                            imageVector = Icons.TwoTone.Delete,
+                            contentDescription = "Delete chat",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -217,7 +265,7 @@ fun HomeScreen(
                     .background(Woodsmoke)
             ) {
                 this@Column.AnimatedVisibility(
-                    visible = chats.isEmpty() && searchQuery.isNotEmpty(),
+                    visible = _state.chats.isEmpty() && _state.searchQuery.isNotEmpty(),
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier.align(Alignment.Center)
@@ -232,23 +280,40 @@ fun HomeScreen(
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-                    items(chats, key = { it.id }) { chat ->
+                    items(_state.chats, key = { it.id }) { chat ->
                         chat.lastMessage?.let {
                             ChatItem(
                                 chat = chat,
                                 lastMessage = it,
-                                onNavigateClick = {
-                                    navigator.navigate(
-                                        ChatScreenDestination(
-                                            chatId = chat.id,
-                                            ownerId = ownerUser?.id.orEmpty(),
-                                            recipientUser = chat.recipientUser,
-                                            messages = chat.messages
-                                        )
-                                    )
-                                },
+                                isSelected = _state.selectedChats.contains(chat),
                                 onClickImage = { /*TODO*/ },
-                                modifier = Modifier.animateItemPlacement()
+                                modifier = Modifier
+                                    .combinedClickable(
+                                        onClick = {
+                                            if (isSelectionChatEnabled) {
+                                                viewModel.selectChat(chat)
+                                                return@combinedClickable
+                                            }
+                                            navigator.navigate(
+                                                ChatScreenDestination(
+                                                    chatId = chat.id,
+                                                    ownerId = _state.ownerUser?.id.orEmpty(),
+                                                    recipientUser = chat.recipientUser,
+                                                    messages = chat.messages
+                                                )
+                                            )
+                                        },
+                                        onLongClick = {
+                                            if (!isSelectionChatEnabled) {
+                                                isSelectionChatEnabled = true
+                                                viewModel.selectChat(chat)
+                                            }
+                                        },
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = rememberRipple()
+                                    )
+                                    .padding(horizontal = 16.dp)
+                                    .animateItemPlacement()
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }

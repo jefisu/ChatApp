@@ -6,5 +6,6 @@ data class HomeState(
     val ownerUser: User?,
     val chats: List<ChatPreview>,
     val users: List<User>,
-    val searchQuery: String
+    val searchQuery: String,
+    val selectedChats: List<ChatPreview>
 )

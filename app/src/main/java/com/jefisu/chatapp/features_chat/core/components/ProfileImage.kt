@@ -37,6 +37,8 @@ fun ProfileImage(
     size: Dp = 65.dp,
     shape: Shape = CircleShape,
     padding: PaddingValues = PaddingValues(),
+    iconAvatar: ImageVector = Icons.Default.Person,
+    iconAvatarAlignment: Alignment = Alignment.BottomCenter,
     iconCorner: ImageVector? = null,
     iconCornerSize: Dp = 22.dp,
     iconCornerBackground: Color = Color.Black,
@@ -62,7 +64,7 @@ fun ProfileImage(
             )
         } else {
             Box(
-                contentAlignment = Alignment.BottomCenter,
+                contentAlignment = iconAvatarAlignment,
                 modifier = Modifier
                     .size(size)
                     .clip(shape)
@@ -76,7 +78,7 @@ fun ProfileImage(
                     .then(modifier)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    imageVector = iconAvatar,
                     contentDescription = null,
                     tint = CoolGrey,
                     modifier = Modifier.size(55.dp)
