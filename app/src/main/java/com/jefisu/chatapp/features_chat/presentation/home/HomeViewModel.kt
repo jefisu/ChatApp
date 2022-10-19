@@ -100,10 +100,10 @@ class HomeViewModel @Inject constructor(
             return
         }
         savedStateHandle["chats"] = chats.value.toMutableList().apply {
-            replaceAll {
-                if (it.id == chatId) {
-                    it.copy(messages = messages)
-                } else it
+            val curChat = first { it.id == chatId }
+            if (messages.size > curChat.messages.size) {
+                removeIf { it == curChat }
+                add(0, curChat.copy(messages = messages))
             }
         }
     }
