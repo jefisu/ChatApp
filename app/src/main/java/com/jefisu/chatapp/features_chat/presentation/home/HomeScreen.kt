@@ -21,11 +21,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -62,7 +65,9 @@ import com.jefisu.chatapp.features_chat.presentation.home.components.ChatItem
 import com.jefisu.chatapp.features_chat.presentation.home.components.UserItem
 import com.jefisu.chatapp.ui.theme.CoolGrey
 import com.jefisu.chatapp.ui.theme.Gunmetal
+import com.jefisu.chatapp.ui.theme.MineShaft
 import com.jefisu.chatapp.ui.theme.Platinum
+import com.jefisu.chatapp.ui.theme.SkyBlue
 import com.jefisu.chatapp.ui.theme.Woodsmoke
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -82,6 +87,7 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     var isSearching by remember { mutableStateOf(false) }
     var isSelectionChatEnabled by remember { mutableStateOf(false) }
+    var showAlert by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true, key2 = state?.selectedChats) {
         viewModel.getUsers()
@@ -95,6 +101,54 @@ fun HomeScreen(
         if (result is NavResult.Value) {
             viewModel.updateMessageByCurrentChat(result.value.chatId, result.value.messages)
         }
+    }
+
+    if (showAlert) {
+        AlertDialog(
+            onDismissRequest = { showAlert = false },
+            title = {
+                Text(
+                    text = if (state?.selectedChats?.size!! > 1) stringResource(
+                        R.string.delete_several,
+                        state?.selectedChats?.size!!,
+                        "chats"
+                    ) else stringResource(R.string.delete_title, "chat"),
+                    fontSize = 20.sp
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(
+                        R.string.are_you_sure_you_want_to_delete,
+                        if (state?.selectedChats?.size!! > 1) "these chats" else "this chat",
+
+                    ),
+                    fontSize = 18.sp
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteChat()
+                        showAlert = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+                ) {
+                    Text(text = "DELETE")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showAlert = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = SkyBlue)
+                ) {
+                    Text(text = "CANCEL")
+                }
+            },
+            backgroundColor = MineShaft,
+            contentColor = Color.White,
+            shape = RoundedCornerShape(8.dp)
+        )
     }
 
     state?.let { _state ->
@@ -249,7 +303,7 @@ fun HomeScreen(
                             uncheckedColor = Color.White
                         )
                     )
-                    IconButton(onClick = viewModel::deleteChat) {
+                    IconButton(onClick = { showAlert = true }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete chat",

@@ -118,9 +118,10 @@ fun ChatScreen(
             title = {
                 Text(
                     text = if (state.selectedMessages.size > 1) stringResource(
-                        R.string.delete_messages,
-                        state.selectedMessages.size
-                    ) else stringResource(R.string.delete_message),
+                        R.string.delete_several,
+                        state.selectedMessages.size,
+                        "messages"
+                    ) else stringResource(R.string.delete_title, "message"),
                     fontSize = 20.sp
                 )
             },
