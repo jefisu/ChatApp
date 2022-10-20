@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jefisu.chatapp.core.util.Resource
+import com.jefisu.chatapp.features_chat.data.dto.DeleteResource
 import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
 import com.jefisu.chatapp.navArgs
@@ -91,24 +92,19 @@ class ChatViewModel @Inject constructor(
 
     private fun deleteMessage() {
         viewModelScope.launch {
-            val chatId = state.value.chatId ?: return@launch
             if (selectedMessages.value.isEmpty()) {
                 return@launch
             }
-            if (selectedMessages.value.size == messages.value.size) {
-                val result = chatUseCases.clearChat(chatId)
-                if (result is Resource.Success) {
-                    savedStateHandle["messages"] = emptyList<Message>()
-                    savedStateHandle["selectedMessages"] = emptyList<Message>()
-                }
-            } else {
-                val result = chatUseCases.deleteMessage(chatId, selectedMessages.value)
-                if (result is Resource.Success) {
-                    savedStateHandle["messages"] = messages.value.toMutableList().apply {
-                        removeAll(selectedMessages.value)
-                    }
-                    savedStateHandle["selectedMessages"] = emptyList<Message>()
-                }
+            val chatId = state.value.chatId ?: return@launch
+            val deleteResource = DeleteResource(
+                id = chatId,
+                items = messages.value.map { it.id }
+            )
+            val result = chatUseCases.deleteMessage(deleteResource)
+            if (result is Resource.Success) {
+                savedStateHandle["messages"] =
+                    messages.value.filter { !selectedMessages.value.contains(it) }
+                savedStateHandle["selectedMessages"] = emptyList<Message>()
             }
         }
     }

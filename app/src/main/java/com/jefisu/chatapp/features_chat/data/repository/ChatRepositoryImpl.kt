@@ -5,10 +5,9 @@ import com.jefisu.chatapp.core.data.mapper.toUser
 import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.core.util.ChatConstants
 import com.jefisu.chatapp.features_chat.data.dto.ChatDto
+import com.jefisu.chatapp.features_chat.data.dto.DeleteResource
 import com.jefisu.chatapp.features_chat.data.mapper.toChat
-import com.jefisu.chatapp.features_chat.data.mapper.toMessageId
 import com.jefisu.chatapp.features_chat.domain.model.Chat
-import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.repository.ChatRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -18,8 +17,6 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class ChatRepositoryImpl(
     private val client: HttpClient
@@ -52,20 +49,18 @@ class ChatRepositoryImpl(
         return users.map { it.toUser() }
     }
 
-    override suspend fun deleteChat(chatId: String): String {
+    override suspend fun deleteChat(deleteResource: DeleteResource): String {
         val response = client.delete {
             url("${ChatConstants.BASE_URL}/chat/bin")
-            parameter("chatId", chatId)
+            setBody(deleteResource)
         }
         return response.body()
     }
 
-    override suspend fun deleteMessage(chatId: String, messages: List<Message>): String {
+    override suspend fun deleteMessage(deleteResource: DeleteResource): String {
         val response = client.delete {
             url("${ChatConstants.BASE_URL}/chat/message")
-            parameter("chatId", chatId)
-            val messageIds = Json.encodeToString(messages.map { it.toMessageId() })
-            setBody(messageIds)
+            setBody(deleteResource)
         }
         return response.body()
     }

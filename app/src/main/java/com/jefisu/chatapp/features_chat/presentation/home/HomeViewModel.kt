@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.core.util.Resource
 import com.jefisu.chatapp.features_chat.core.util.DateUtil
+import com.jefisu.chatapp.features_chat.data.dto.DeleteResource
 import com.jefisu.chatapp.features_chat.domain.model.Chat
 import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
@@ -30,7 +31,8 @@ class HomeViewModel @Inject constructor(
     private val users = savedStateHandle.getStateFlow("users", emptyList<User>())
     private val ownerUser = savedStateHandle.getStateFlow<User?>("user", null)
     private val searchQuery = savedStateHandle.getStateFlow("searchQuery", "")
-    private val selectedChats = savedStateHandle.getStateFlow("selectedChats", emptyList<ChatPreview>())
+    private val selectedChats =
+        savedStateHandle.getStateFlow("selectedChats", emptyList<ChatPreview>())
 
     val state = combine(
         chats,
@@ -131,21 +133,19 @@ class HomeViewModel @Inject constructor(
 
     fun deleteChat() {
         viewModelScope.launch {
-            if (selectedChats.value.isNotEmpty()) {
-                selectedChats.value.forEach { chat ->
-                    val result = chatUseCases.deleteChat(chat.id)
-                    when (result) {
-                        is Resource.Success -> {
-                            savedStateHandle["chats"] = chats.value.toMutableList().apply {
-                               removeIf { chat.id == it.id }
-                            }
-                            savedStateHandle["selectedChats"] = selectedChats.value.toMutableList().apply {
-                                removeIf { it.id == chat.id }
-                            }
-                        }
-                        is Resource.Error -> Unit
-                    }
+            if (selectedChats.value.isEmpty()) {
+                return@launch
+            }
+            val deleteResource = DeleteResource(
+                id = state.value?.ownerUser!!.id,
+                items = selectedChats.value.map { it.id }
+            )
+            val result = chatUseCases.deleteChat(deleteResource)
+            if (result is Resource.Success) {
+                savedStateHandle["chats"] = chats.value.toMutableList().apply {
+                    removeAll { chat -> selectedChats.value.map { it.id }.contains(chat.id) }
                 }
+                savedStateHandle["selectedChats"] = emptyList<ChatPreview>()
             }
         }
     }
