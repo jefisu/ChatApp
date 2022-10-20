@@ -9,5 +9,7 @@ data class ChatUseCases(
     val getChat: GetChat,
     val observeMessages: ObserveMessages,
     val sendMessage: SendMessage,
-    val deleteChat: DeleteChat
+    val deleteChat: DeleteChat,
+    val  clearChat: ClearChat,
+    val deleteMessage: DeleteMessage
 )

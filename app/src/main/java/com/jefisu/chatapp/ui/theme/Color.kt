@@ -26,6 +26,7 @@ val OuterSpace = Color(0xFF2A3942)
 val EbonyClay = Color(0xFF2E3541)
 val CharlestonGreen = Color(0xFF202C33)
 val CoolGrey = Color(0xFF8696A0)
+val MineShaft = Color(0xFF212121)
 
 val VirginAmerica = listOf(
     Color(0xFF7b4397),

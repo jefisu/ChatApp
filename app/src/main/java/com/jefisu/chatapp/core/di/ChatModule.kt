@@ -6,8 +6,10 @@ import com.jefisu.chatapp.features_chat.data.services.ChatSocketServiceImpl
 import com.jefisu.chatapp.features_chat.domain.repository.ChatRepository
 import com.jefisu.chatapp.features_chat.domain.services.ChatSocketService
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
+import com.jefisu.chatapp.features_chat.domain.use_cases.ClearChat
 import com.jefisu.chatapp.features_chat.domain.use_cases.ConnectToChat
 import com.jefisu.chatapp.features_chat.domain.use_cases.DeleteChat
+import com.jefisu.chatapp.features_chat.domain.use_cases.DeleteMessage
 import com.jefisu.chatapp.features_chat.domain.use_cases.ExitChat
 import com.jefisu.chatapp.features_chat.domain.use_cases.GetAllUsers
 import com.jefisu.chatapp.features_chat.domain.use_cases.GetChat
@@ -54,7 +56,9 @@ object ChatModule {
             getChat = GetChat(repository),
             observeMessages = ObserveMessages(service),
             sendMessage = SendMessage(service),
-            deleteChat = DeleteChat(repository)
+            deleteChat = DeleteChat(repository),
+            clearChat = ClearChat(repository),
+            deleteMessage = DeleteMessage(repository)
         )
     }
 }

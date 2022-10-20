@@ -6,7 +6,9 @@ import com.jefisu.chatapp.core.data.model.User
 import com.jefisu.chatapp.core.util.ChatConstants
 import com.jefisu.chatapp.features_chat.data.dto.ChatDto
 import com.jefisu.chatapp.features_chat.data.mapper.toChat
+import com.jefisu.chatapp.features_chat.data.mapper.toMessageId
 import com.jefisu.chatapp.features_chat.domain.model.Chat
+import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.repository.ChatRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -14,7 +16,10 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class ChatRepositoryImpl(
     private val client: HttpClient
@@ -50,6 +55,24 @@ class ChatRepositoryImpl(
     override suspend fun deleteChat(chatId: String): String {
         val response = client.delete {
             url("${ChatConstants.BASE_URL}/chat/bin")
+            parameter("chatId", chatId)
+        }
+        return response.body()
+    }
+
+    override suspend fun deleteMessage(chatId: String, messages: List<Message>): String {
+        val response = client.delete {
+            url("${ChatConstants.BASE_URL}/chat/message")
+            parameter("chatId", chatId)
+            val messageIds = Json.encodeToString(messages.map { it.toMessageId() })
+            setBody(messageIds)
+        }
+        return response.body()
+    }
+
+    override suspend fun clearChat(chatId: String): String {
+        val response = client.delete {
+            url("${ChatConstants.BASE_URL}/chat/clear-messages")
             parameter("chatId", chatId)
         }
         return response.body()

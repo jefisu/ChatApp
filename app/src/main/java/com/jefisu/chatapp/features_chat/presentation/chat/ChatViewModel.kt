@@ -3,6 +3,8 @@ package com.jefisu.chatapp.features_chat.presentation.chat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jefisu.chatapp.core.util.Resource
+import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
 import com.jefisu.chatapp.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,14 +24,21 @@ class ChatViewModel @Inject constructor(
 
     private val messages = savedStateHandle.getStateFlow("messages", navArgs.messages)
     private val messageText = savedStateHandle.getStateFlow("messageText", "")
+    private val selectedMessages =
+        savedStateHandle.getStateFlow("selectedMessages", emptyList<Message>())
 
-    val state = combine(messages, messageText) { messages, messageText ->
+    val state = combine(
+        messages,
+        messageText,
+        selectedMessages
+    ) { messages, messageText, selectedMessages ->
         ChatState(
             chatId = navArgs.chatId,
             messages = messages,
             ownerId = navArgs.ownerId,
             recipientUser = navArgs.recipientUser,
-            messageText = messageText
+            messageText = messageText,
+            selectedMessages = selectedMessages
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ChatState())
 
@@ -53,10 +62,15 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.MessageTextChange -> {
                 savedStateHandle["messageText"] = event.value
             }
+
             is ChatEvent.ClearText -> {
                 savedStateHandle["messageText"] = ""
             }
+
             is ChatEvent.SendMessage -> sendMessage()
+            is ChatEvent.SelectMessage -> selectedMessage(event.message)
+            is ChatEvent.ClearSelectionMessages -> clearSelection()
+            is ChatEvent.DeleteMessages -> deleteMessage()
         }
     }
 
@@ -73,5 +87,41 @@ class ChatViewModel @Inject constructor(
                 savedStateHandle["messageText"] = ""
             }
         }
+    }
+
+    private fun deleteMessage() {
+        viewModelScope.launch {
+            val chatId = state.value.chatId ?: return@launch
+            if (selectedMessages.value.isEmpty()) {
+                return@launch
+            }
+            if (selectedMessages.value.size == messages.value.size) {
+                val result = chatUseCases.clearChat(chatId)
+                if (result is Resource.Success) {
+                    savedStateHandle["messages"] = emptyList<Message>()
+                    savedStateHandle["selectedMessages"] = emptyList<Message>()
+                }
+            } else {
+                val result = chatUseCases.deleteMessage(chatId, selectedMessages.value)
+                if (result is Resource.Success) {
+                    savedStateHandle["messages"] = messages.value.toMutableList().apply {
+                        removeAll(selectedMessages.value)
+                    }
+                    savedStateHandle["selectedMessages"] = emptyList<Message>()
+                }
+            }
+        }
+    }
+
+    private fun clearSelection() {
+        savedStateHandle["selectedMessages"] = emptyList<Message>()
+    }
+
+    private fun selectedMessage(message: Message) {
+        if (selectedMessages.value.contains(message)) {
+            savedStateHandle["selectedMessages"] = selectedMessages.value - message
+            return
+        }
+        savedStateHandle["selectedMessages"] = selectedMessages.value + message
     }
 }

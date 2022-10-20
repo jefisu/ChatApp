@@ -39,4 +39,7 @@
     <string name="repeat_new_password_again">Repeat the new password again</string>
     <string name="the_confirmation_password_must">The confirmation password must be the new password.</string>
     <string name="no_results_found">No results found</string>
+    <string name="delete_message">Delete message</string>
+    <string name="delete_messages">Delete %d messages</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete %s?</string>
 </resources>

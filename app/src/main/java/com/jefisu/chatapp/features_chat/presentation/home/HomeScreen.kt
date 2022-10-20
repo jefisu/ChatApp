@@ -31,8 +31,8 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -251,7 +251,7 @@ fun HomeScreen(
                     )
                     IconButton(onClick = viewModel::deleteChat) {
                         Icon(
-                            imageVector = Icons.TwoTone.Delete,
+                            imageVector = Icons.Default.Delete,
                             contentDescription = "Delete chat",
                             tint = Color.White
                         )
