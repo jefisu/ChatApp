@@ -117,7 +117,13 @@ fun ChatBubble(
                 )
                 .background(if (isOwnMessage) Gunmetal else CharlestonGreen)
                 .padding(horizontal = 6.dp, vertical = 4.dp)
-                .align(alignAnim)
+                .align(
+                    when {
+                        selectionEnabled -> alignAnim
+                        isOwnMessage -> Alignment.CenterEnd
+                        else -> Alignment.CenterStart
+                    }
+                )
         ) {
             Text(
                 text = message,
