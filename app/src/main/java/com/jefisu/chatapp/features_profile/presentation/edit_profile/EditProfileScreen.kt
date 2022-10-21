@@ -2,6 +2,7 @@ package com.jefisu.chatapp.features_profile.presentation.edit_profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,8 +63,8 @@ fun EditProfileScreen(
     var uriFile by remember {
         mutableStateOf<Uri?>(null)
     }
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+    val imageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             uriFile = uri
             val pickedFile = uri?.let(context.contentResolver::openInputStream)
@@ -108,7 +109,7 @@ fun EditProfileScreen(
             ProfileImage(
                 avatarUrl = uriFile?.toString() ?: user.avatarUrl,
                 size = 130.dp,
-                onClick = { launcher.launch("image/*") },
+                onClick = { imageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 iconCorner = Icons.Default.CameraAlt,
                 iconCornerBackground = VampireBlack,
