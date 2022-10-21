@@ -1,56 +1,23 @@
 package com.jefisu.chatapp.features_chat.presentation.chat
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.with
+import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,13 +32,7 @@ import com.jefisu.chatapp.features_chat.core.util.DateUtil
 import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.presentation.chat.components.ChatBubble
 import com.jefisu.chatapp.features_chat.presentation.home.HomeNavArg
-import com.jefisu.chatapp.ui.theme.CoolGrey
-import com.jefisu.chatapp.ui.theme.Gunmetal
-import com.jefisu.chatapp.ui.theme.MineShaft
-import com.jefisu.chatapp.ui.theme.OuterSpace
-import com.jefisu.chatapp.ui.theme.QuickSilver
-import com.jefisu.chatapp.ui.theme.SkyBlue
-import com.jefisu.chatapp.ui.theme.Woodsmoke
+import com.jefisu.chatapp.ui.theme.*
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.result.ResultBackNavigator
@@ -105,6 +66,7 @@ fun ChatScreen(
     val state by viewModel.state.collectAsState()
     val messagesMap = state.messages.groupBy { DateUtil.getDateExt(it.timestamp) }
     var showAlert by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = state.selectedMessages) {
         if (state.selectedMessages.isEmpty()) {
@@ -117,32 +79,53 @@ fun ChatScreen(
             onDismissRequest = { showAlert = false },
             title = {
                 Text(
-                    text = if (state.selectedMessages.size > 1) stringResource(
-                        R.string.delete_several,
-                        state.selectedMessages.size,
-                        "messages"
-                    ) else stringResource(R.string.delete_title, "message"),
+                    text = when {
+                        state.selectedMessages.size > 1 -> stringResource(
+                            R.string.delete_several,
+                            state.selectedMessages.size,
+                            "messages"
+                        )
+                        state.selectedMessages.size == 1 -> stringResource(
+                            R.string.delete_title,
+                            "message"
+                        )
+                        else -> stringResource(R.string.clear_history)
+                    },
                     fontSize = 20.sp
                 )
             },
             text = {
                 Text(
-                    text = stringResource(
-                        R.string.are_you_sure_you_want_to_delete,
-                        if (state.selectedMessages.size > 1) "these messages" else "this message"
-                    ),
+                    text = when {
+                        state.selectedMessages.size > 1 -> stringResource(
+                            R.string.are_you_sure_you_want_to_delete,
+                            "these messages"
+                        )
+                        state.selectedMessages.size == 1 -> stringResource(
+                            R.string.are_you_sure_you_want_to_delete,
+                            "this message"
+                        )
+                        else -> stringResource(
+                            R.string.are_you_sure_you_want_to_clear,
+                            state.recipientUser?.username.orEmpty()
+                        )
+                    },
                     fontSize = 18.sp
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.onEvent(ChatEvent.DeleteMessages)
+                        if (state.selectedMessages.isNotEmpty()) {
+                            viewModel.onEvent(ChatEvent.DeleteMessages)
+                        } else {
+                            viewModel.onEvent(ChatEvent.ClearHistory)
+                        }
                         showAlert = false
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
-                    Text(text = "DELETE")
+                    Text(text = stringResource(R.string.delete_button).uppercase())
                 }
             },
             dismissButton = {
@@ -150,7 +133,7 @@ fun ChatScreen(
                     onClick = { showAlert = false },
                     colors = ButtonDefaults.textButtonColors(contentColor = SkyBlue)
                 ) {
-                    Text(text = "CANCEL")
+                    Text(text = stringResource(R.string.cancel_button).uppercase())
                 }
             },
             backgroundColor = MineShaft,
@@ -158,7 +141,6 @@ fun ChatScreen(
             shape = RoundedCornerShape(8.dp)
         )
     }
-
     Column(
         modifier = Modifier.background(Gunmetal)
     ) {
@@ -167,28 +149,68 @@ fun ChatScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(vertical = 7.dp)
             ) {
-                CustomIconButton(
-                    icon = Icons.Default.ArrowBack,
+                IconButton(
                     onClick = {
                         resultBackNavigator.navigateBack(
                             HomeNavArg(state.chatId, state.messages as ArrayList<Message>)
                         )
                     }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                ProfileImage(
+                    avatarUrl = state.recipientUser?.avatarUrl,
+                    size = 50.dp
                 )
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = state.recipientUser?.username.orEmpty(),
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
-                ProfileImage(
-                    avatarUrl = state.recipientUser?.avatarUrl,
-                    size = 47.dp
-                )
+                IconButton(onClick = { /* TODO */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    offset = DpOffset(x = 205.dp, (-45).dp),
+                    modifier = Modifier
+                        .background(MineShaft)
+                        .width(180.dp)
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            showAlert = true
+                            showMenu = false
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.clear_history),
+                            color = Color.White
+                        )
+                    }
+                }
             }
         }
         AnimatedVisibility(visible = state.selectedMessages.isNotEmpty()) {
@@ -196,7 +218,7 @@ fun ChatScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
+                    .padding(vertical = 7.dp)
             ) {
                 IconButton(onClick = { viewModel.onEvent(ChatEvent.ClearSelectionMessages) }) {
                     Icon(
@@ -235,14 +257,11 @@ fun ChatScreen(
         }
         Column(
             verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Woodsmoke)
-                .padding(bottom = 12.dp)
+            modifier = Modifier.background(Woodsmoke)
         ) {
             LazyColumn(
                 reverseLayout = true,
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Bottom),
+                verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Bottom),
                 modifier = Modifier.weight(1f)
             ) {
                 messagesMap.forEach { (_, messages) ->
@@ -276,19 +295,20 @@ fun ChatScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    8.dp,
+                                    Alignment.CenterHorizontally
+                                )
                             ) {
                                 Divider(
                                     color = CoolGrey,
                                     modifier = Modifier.width(80.dp)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = DateUtil.getDateByMessages(message.timestamp),
                                     color = CoolGrey,
                                     fontSize = 12.sp
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Divider(
                                     color = CoolGrey,
                                     modifier = Modifier.width(80.dp)
@@ -297,16 +317,12 @@ fun ChatScreen(
                         }
                     }
                 }
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
             }
-            Spacer(modifier = Modifier.height(6.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 ChatTextField(
                     text = state.messageText,

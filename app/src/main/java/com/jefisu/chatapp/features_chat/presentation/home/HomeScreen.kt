@@ -98,8 +98,10 @@ fun HomeScreen(
     }
 
     resultRecipient.onNavResult { result ->
-        if (result is NavResult.Value) {
+        if (result is NavResult.Value && result.value.messages.isNotEmpty()) {
             viewModel.updateMessageByCurrentChat(result.value.chatId, result.value.messages)
+        } else {
+            viewModel.loadChats()
         }
     }
 
@@ -121,7 +123,6 @@ fun HomeScreen(
                     text = stringResource(
                         R.string.are_you_sure_you_want_to_delete,
                         if (state?.selectedChats?.size!! > 1) "these chats" else "this chat",
-
                     ),
                     fontSize = 18.sp
                 )
@@ -134,7 +135,7 @@ fun HomeScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
-                    Text(text = "DELETE")
+                    Text(text = stringResource(R.string.delete_button).uppercase())
                 }
             },
             dismissButton = {
@@ -142,7 +143,7 @@ fun HomeScreen(
                     onClick = { showAlert = false },
                     colors = ButtonDefaults.textButtonColors(contentColor = SkyBlue)
                 ) {
-                    Text(text = "CANCEL")
+                    Text(text = stringResource(R.string.cancel_button).uppercase())
                 }
             },
             backgroundColor = MineShaft,

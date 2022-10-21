@@ -42,4 +42,8 @@
     <string name="delete_title">Delete %s</string>
     <string name="delete_several">Delete %d %s</string>
     <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete %s?</string>
+    <string name="clear_history">Clear History</string>
+    <string name="are_you_sure_you_want_to_clear">Are you sure you want to clear your chat history with %s?</string>
+    <string name="delete_button">delete</string>
+    <string name="cancel_button">cancel</string>
 </resources>

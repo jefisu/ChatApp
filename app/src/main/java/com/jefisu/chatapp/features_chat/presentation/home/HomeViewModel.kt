@@ -70,10 +70,10 @@ class HomeViewModel @Inject constructor(
 
     init {
         getUsers()
-        loadChatsUsers()
+        loadChats()
     }
 
-    private fun loadChatsUsers() {
+    fun loadChats() {
         viewModelScope.launch {
             ownerUser.value?.let {
                 savedStateHandle["chats"] = chatUseCases.getChatsByUser(it.id)
@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
 
     fun updateMessageByCurrentChat(chatId: String?, messages: List<Message>) {
         if (chatId == null) {
-            loadChatsUsers()
+            loadChats()
             return
         }
         savedStateHandle["chats"] = chats.value.toMutableList().apply {

@@ -63,15 +63,14 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.MessageTextChange -> {
                 savedStateHandle["messageText"] = event.value
             }
-
             is ChatEvent.ClearText -> {
                 savedStateHandle["messageText"] = ""
             }
-
             is ChatEvent.SendMessage -> sendMessage()
             is ChatEvent.SelectMessage -> selectedMessage(event.message)
             is ChatEvent.ClearSelectionMessages -> clearSelection()
             is ChatEvent.DeleteMessages -> deleteMessage()
+            is ChatEvent.ClearHistory -> clearHistory()
         }
     }
 
@@ -119,5 +118,16 @@ class ChatViewModel @Inject constructor(
             return
         }
         savedStateHandle["selectedMessages"] = selectedMessages.value + message
+    }
+
+    private fun clearHistory() {
+        viewModelScope.launch {
+            if (navArgs.chatId != null) {
+                val result = chatUseCases.clearChat(navArgs.chatId)
+                if (result is Resource.Success) {
+                    savedStateHandle["messages"] = arrayListOf<Message>()
+                }
+            }
+        }
     }
 }
