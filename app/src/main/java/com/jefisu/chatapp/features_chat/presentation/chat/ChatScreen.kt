@@ -191,24 +191,28 @@ fun ChatScreen(
                         tint = Color.White
                     )
                 }
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
-                    offset = DpOffset(x = 205.dp, (-45).dp),
-                    modifier = Modifier
-                        .background(MineShaft)
-                        .width(180.dp)
+                AnimatedVisibility(
+                    visible = showMenu,
+                    modifier = Modifier.offset(x = (-5).dp, y = (-25).dp)
                 ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            showAlert = true
-                            showMenu = false
-                        }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier
+                            .background(MineShaft)
+                            .width(180.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.clear_history),
-                            color = Color.White
-                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                showAlert = true
+                                showMenu = false
+                            }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.clear_history),
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
