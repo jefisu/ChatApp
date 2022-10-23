@@ -10,5 +10,6 @@ data class ChatState(
     val recipientUser: User? = null,
     val messageText: String = "",
     val isBlankText: Boolean = messageText.isBlank(),
-    val selectedMessages: List<Message> = emptyList()
+    val selectedMessages: List<Message> = emptyList(),
+    val searchMessageQuery: String = ""
 )

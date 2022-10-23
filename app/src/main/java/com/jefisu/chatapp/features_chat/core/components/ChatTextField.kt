@@ -25,7 +25,6 @@ import com.jefisu.chatapp.ui.theme.QuickSilver
 fun ChatTextField(
     text: String,
     onTextChange: (String) -> Unit,
-    onClearText: () -> Unit,
     hint: String,
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(16.dp),
@@ -48,7 +47,7 @@ fun ChatTextField(
         colors = colors,
         trailingIcon = {
             if (text.isNotBlank()) {
-                IconButton(onClick = onClearText) {
+                IconButton(onClick = { onTextChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = null,

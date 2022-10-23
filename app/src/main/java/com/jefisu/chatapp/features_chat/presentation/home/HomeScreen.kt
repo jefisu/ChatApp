@@ -29,8 +29,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -49,12 +47,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jefisu.chatapp.R
+import com.jefisu.chatapp.core.presentation.components.SearchTextField
 import com.jefisu.chatapp.core.util.CustomTransitions
 import com.jefisu.chatapp.destinations.ChatScreenDestination
 import com.jefisu.chatapp.destinations.ProfileScreenDestination
@@ -69,6 +67,7 @@ import com.jefisu.chatapp.ui.theme.MineShaft
 import com.jefisu.chatapp.ui.theme.Platinum
 import com.jefisu.chatapp.ui.theme.SkyBlue
 import com.jefisu.chatapp.ui.theme.Woodsmoke
+import com.jefisu.chatapp.ui.theme.heightTopBar
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -231,47 +230,31 @@ fun HomeScreen(
                 }
             }
             AnimatedVisibility(visible = isSearching) {
-                TextField(
-                    value = _state.searchQuery,
-                    onValueChange = viewModel::searchChats,
-                    singleLine = true,
-                    placeholder = { Text(text = "Search...", fontSize = 20.sp) },
-                    textStyle = TextStyle(fontSize = 20.sp),
-                    leadingIcon = {
-                        IconButton(onClick = {
-                            isSearching = !isSearching
-                            viewModel.searchChats("")
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Close search",
-                                tint = CoolGrey
-                            )
-                        }
-                    },
-                    trailingIcon = {
-                        if (_state.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.searchChats("") }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Clear search query",
-                                    tint = CoolGrey
-                                )
-                            }
-                        }
-                    },
-                    colors = TextFieldDefaults.textFieldColors(
-                        cursorColor = Color.White,
-                        textColor = Color.White,
-                        placeholderColor = CoolGrey,
-                        backgroundColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent
-                    ),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(6.dp)
-                )
+                        .height(heightTopBar)
+                ) {
+                    IconButton(
+                        onClick = {
+                            isSearching = !isSearching
+                            viewModel.searchChats("")
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = null,
+                            tint = CoolGrey
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    SearchTextField(
+                        text = _state.searchQuery,
+                        onTextChange = viewModel::searchChats,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
             AnimatedVisibility(visible = isSelectionChatEnabled) {
                 Row(

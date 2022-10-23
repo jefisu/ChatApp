@@ -25,21 +25,23 @@ class ChatViewModel @Inject constructor(
 
     private val messages = savedStateHandle.getStateFlow("messages", navArgs.messages)
     private val messageText = savedStateHandle.getStateFlow("messageText", "")
-    private val selectedMessages =
-        savedStateHandle.getStateFlow("selectedMessages", emptyList<Message>())
+    private val selectedMessages = savedStateHandle.getStateFlow("selectedMessages", emptyList<Message>())
+    private val searchMessages = savedStateHandle.getStateFlow("searchMessages", "")
 
     val state = combine(
         messages,
         messageText,
-        selectedMessages
-    ) { messages, messageText, selectedMessages ->
+        selectedMessages,
+        searchMessages
+    ) { messages, messageText, selectedMessages, searchQuery ->
         ChatState(
             chatId = navArgs.chatId,
             messages = messages,
             ownerId = navArgs.ownerId,
             recipientUser = navArgs.recipientUser,
             messageText = messageText,
-            selectedMessages = selectedMessages
+            selectedMessages = selectedMessages,
+            searchMessageQuery = searchQuery
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ChatState())
 
@@ -60,17 +62,13 @@ class ChatViewModel @Inject constructor(
 
     fun onEvent(event: ChatEvent) {
         when (event) {
-            is ChatEvent.MessageTextChange -> {
-                savedStateHandle["messageText"] = event.value
-            }
-            is ChatEvent.ClearText -> {
-                savedStateHandle["messageText"] = ""
-            }
+            is ChatEvent.MessageTextChange -> savedStateHandle["messageText"] = event.value
             is ChatEvent.SendMessage -> sendMessage()
             is ChatEvent.SelectMessage -> selectedMessage(event.message)
-            is ChatEvent.ClearSelectionMessages -> clearSelection()
+            is ChatEvent.ClearSelectionMessages -> savedStateHandle["selectedMessages"] = emptyList<Message>()
             is ChatEvent.DeleteMessages -> deleteMessage()
             is ChatEvent.ClearHistory -> clearHistory()
+            is ChatEvent.SearchMessage -> savedStateHandle["searchMessages"] = event.query
         }
     }
 
@@ -106,10 +104,6 @@ class ChatViewModel @Inject constructor(
                 savedStateHandle["selectedMessages"] = emptyList<Message>()
             }
         }
-    }
-
-    private fun clearSelection() {
-        savedStateHandle["selectedMessages"] = emptyList<Message>()
     }
 
     private fun selectedMessage(message: Message) {

@@ -1,5 +1,6 @@
 package com.jefisu.chatapp.features_chat.presentation.chat.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -34,7 +35,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jefisu.chatapp.R
@@ -53,6 +57,7 @@ fun ChatBubble(
     isOwnMessage: Boolean,
     selectionEnabled: Boolean,
     isSelected: Boolean,
+    findText: String,
     modifier: Modifier = Modifier
 ) {
     val selectedColorAnim by animateColorAsState(
@@ -126,7 +131,23 @@ fun ChatBubble(
                 )
         ) {
             Text(
-                text = message,
+                text = buildAnnotatedString {
+                    if (findText.isBlank() || !message.contains(findText, true)) {
+                        append(message)
+                        return@buildAnnotatedString
+                    }
+                    val firstOccurrenceIndex = message.indexOf(findText, ignoreCase = true)
+                    val lastOccurrenceIndex = findText.length + firstOccurrenceIndex
+                    message.forEachIndexed { index, c ->
+                        if (index in firstOccurrenceIndex until lastOccurrenceIndex) {
+                            withStyle(style = SpanStyle(background = CoolGrey)) {
+                                append(c)
+                            }
+                        } else {
+                            append(c)
+                        }
+                    }
+                },
                 color = Color.White,
                 textAlign = TextAlign.Justify,
                 lineHeight = 18.sp,
