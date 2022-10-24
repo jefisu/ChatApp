@@ -109,7 +109,13 @@ fun EditProfileScreen(
             ProfileImage(
                 avatarUrl = uriFile?.toString() ?: user.avatarUrl,
                 size = 130.dp,
-                onClick = { imageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                onClick = {
+                    imageLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 iconCorner = Icons.Default.CameraAlt,
                 iconCornerBackground = VampireBlack,

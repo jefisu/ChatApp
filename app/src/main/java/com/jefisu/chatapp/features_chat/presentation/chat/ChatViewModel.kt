@@ -9,11 +9,11 @@ import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
 import com.jefisu.chatapp.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -25,7 +25,8 @@ class ChatViewModel @Inject constructor(
 
     private val messages = savedStateHandle.getStateFlow("messages", navArgs.messages)
     private val messageText = savedStateHandle.getStateFlow("messageText", "")
-    private val selectedMessages = savedStateHandle.getStateFlow("selectedMessages", emptyList<Message>())
+    private val selectedMessages =
+        savedStateHandle.getStateFlow("selectedMessages", emptyList<Message>())
     private val searchMessages = savedStateHandle.getStateFlow("searchMessages", "")
 
     val state = combine(
@@ -65,7 +66,9 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.MessageTextChange -> savedStateHandle["messageText"] = event.value
             is ChatEvent.SendMessage -> sendMessage()
             is ChatEvent.SelectMessage -> selectedMessage(event.message)
-            is ChatEvent.ClearSelectionMessages -> savedStateHandle["selectedMessages"] = emptyList<Message>()
+            is ChatEvent.ClearSelectionMessages -> {
+                savedStateHandle["selectedMessages"] = emptyList<Message>()
+            }
             is ChatEvent.DeleteMessages -> deleteMessage()
             is ChatEvent.ClearHistory -> clearHistory()
             is ChatEvent.SearchMessage -> savedStateHandle["searchMessages"] = event.query

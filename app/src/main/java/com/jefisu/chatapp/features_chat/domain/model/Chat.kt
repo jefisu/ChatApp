@@ -9,4 +9,4 @@ data class Chat(
     val messages: List<Message>,
     val createdAt: Long,
     val id: String
-):  Parcelable
+) : Parcelable

@@ -30,18 +30,22 @@ object ValidateUtil {
                 errorMessage = UiText.StringResource(R.string.password_consist_least_8_characters)
             )
         }
-        val containsLettersAndDigits = value.any { it.isDigit() }
-                && value.any { it.isLetter() }
+        val containsLettersAndDigits = value.any { it.isDigit() } &&
+            value.any { it.isLetter() }
         if (!containsLettersAndDigits) {
             return ValidationResult(
                 successful = false,
-                errorMessage = UiText.StringResource(R.string.password_needs_contain_letter_and_digit)
+                errorMessage = UiText.StringResource(
+                    R.string.password_needs_contain_letter_and_digit
+                )
             )
         }
         if (repeatPassword != null && value != repeatPassword) {
             return ValidationResult(
                 successful = false,
-                errorMessage = UiText.StringResource(R.string.the_confirmation_password_must)
+                errorMessage = UiText.StringResource(
+                    R.string.the_confirmation_password_must
+                )
             )
         }
 
@@ -60,7 +64,9 @@ object ValidateUtil {
         if (value.contains(" ")) {
             return ValidationResult(
                 successful = false,
-                errorMessage = UiText.StringResource(R.string.username_cant_contain_spaces_and_special_characters)
+                errorMessage = UiText.StringResource(
+                    R.string.username_cant_contain_spaces_and_special_characters
+                )
             )
         }
         return ValidationResult(

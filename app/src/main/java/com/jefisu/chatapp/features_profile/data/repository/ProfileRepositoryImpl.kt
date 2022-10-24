@@ -26,11 +26,17 @@ class ProfileRepositoryImpl(
         val response = client.put {
             url("${ChatConstants.BASE_URL}/user/change-avatar")
             parameter("userId", user.id)
-            setBody(MultiPartFormDataContent(formData {
-                append(key = "avatarImage",
-                    filename = "${generateNonce()}.png",
-                    bodyBuilder = { writeFully(data) })
-            }))
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append(
+                            key = "avatarImage",
+                            filename = "${generateNonce()}.png",
+                            bodyBuilder = { writeFully(data) }
+                        )
+                    }
+                )
+            )
         }
         return response.bodyAsText()
     }

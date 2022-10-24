@@ -10,12 +10,12 @@ import com.jefisu.chatapp.destinations.HomeScreenDestination
 import com.jefisu.chatapp.destinations.LoginScreenDestination
 import com.jefisu.chatapp.features_auth.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(

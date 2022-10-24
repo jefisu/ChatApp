@@ -139,6 +139,7 @@ fun ChatScreen(
     val quantityMessagesLocated = state.messages.quantityMessagesLocated(state.searchMessageQuery)
     val indicesMessagesLocated = state.messages.indexesOf(state.searchMessageQuery)
     var currentSearchIndex by remember { mutableStateOf(0) }
+    val contentColor = LocalContentColor.current
 
     LaunchedEffect(key1 = state.selectedMessages, key2 = state.searchMessageQuery) {
         if (state.selectedMessages.isEmpty()) {
@@ -231,7 +232,9 @@ fun ChatScreen(
             IconButton(
                 onClick = {
                     when {
-                        state.selectedMessages.isNotEmpty() -> viewModel.onEvent(ChatEvent.ClearSelectionMessages)
+                        state.selectedMessages.isNotEmpty() -> {
+                            viewModel.onEvent(ChatEvent.ClearSelectionMessages)
+                        }
                         isSearching -> {
                             isSearching = false
                             viewModel.onEvent(ChatEvent.SearchMessage(""))
@@ -247,7 +250,9 @@ fun ChatScreen(
                 modifier = Modifier.graphicsLayer(rotationZ = iconRotateAnim)
             ) {
                 Icon(
-                    imageVector = if (state.selectedMessages.isNotEmpty()) Icons.Default.Close else Icons.Default.ArrowBack,
+                    imageVector = if (state.selectedMessages.isNotEmpty()) {
+                        Icons.Default.Close
+                    } else Icons.Default.ArrowBack,
                     contentDescription = null,
                     tint = Color.White
                 )
@@ -336,9 +341,17 @@ fun ChatScreen(
                                 targetState = state.selectedMessages.size,
                                 transitionSpec = {
                                     if (targetState > initialState) {
-                                        slideInVertically { it } + fadeIn() with slideOutVertically { -it } + fadeOut()
+                                        slideInVertically(
+                                            initialOffsetY = { it }
+                                        ) + fadeIn() with slideOutVertically(
+                                            targetOffsetY = { -it }
+                                        ) + fadeOut()
                                     } else {
-                                        slideInVertically { -it } + fadeIn() with slideOutVertically { it } + fadeOut()
+                                        slideInVertically(
+                                            initialOffsetY = { -it }
+                                        ) + fadeIn() with slideOutVertically(
+                                            targetOffsetY = { it }
+                                        ) + fadeOut()
                                     } using SizeTransform(
                                         clip = false
                                     )
@@ -374,6 +387,10 @@ fun ChatScreen(
             ) {
                 messagesMap.forEach { (_, messages) ->
                     itemsIndexed(messages) { index, message ->
+                        val currentSelectedIndex = indicesMessagesLocated[currentSearchIndex]
+                        val locatedText = if (currentSelectedIndex == index) {
+                            state.searchMessageQuery
+                        } else ""
                         ChatBubble(
                             message = message.text,
                             time = DateUtil.toHour(message.timestamp),
@@ -381,7 +398,7 @@ fun ChatScreen(
                             isOwnMessage = message.userId == state.ownerId,
                             selectionEnabled = state.selectedMessages.isNotEmpty(),
                             isSelected = state.selectedMessages.contains(message),
-                            findText = if (indicesMessagesLocated[currentSearchIndex] == index) state.searchMessageQuery else "",
+                            findText = locatedText,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .combinedClickable(
@@ -446,7 +463,9 @@ fun ChatScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     CustomIconButton(
-                        icon = if (state.isBlankText) Icons.Default.AttachFile else Icons.Default.Send,
+                        icon = if (state.isBlankText) {
+                            Icons.Default.AttachFile
+                        } else Icons.Default.Send,
                         backgroundSize = 55.dp,
                         rotationZIcon = if (state.isBlankText) (-18).dp else 0.dp,
                         iconColor = QuickSilver,
@@ -468,12 +487,13 @@ fun ChatScreen(
                             currentSearchIndex += 1
                         }
                     }) {
+                        val color = if (currentSearchIndex < quantityMessagesLocated - 1) {
+                            CoolGrey
+                        } else contentColor.copy(alpha = ContentAlpha.disabled)
                         Icon(
                             imageVector = Icons.Default.ArrowUpward,
                             contentDescription = null,
-                            tint = if (currentSearchIndex < quantityMessagesLocated - 1) CoolGrey else LocalContentColor.current.copy(
-                                alpha = ContentAlpha.disabled
-                            )
+                            tint = color
                         )
                     }
                     IconButton(onClick = {
@@ -481,12 +501,13 @@ fun ChatScreen(
                             currentSearchIndex -= 1
                         }
                     }) {
+                        val color = if (currentSearchIndex > 0) CoolGrey else {
+                            contentColor.copy(alpha = ContentAlpha.disabled)
+                        }
                         Icon(
                             imageVector = Icons.Default.ArrowDownward,
                             contentDescription = null,
-                            tint = if (currentSearchIndex > 0) CoolGrey else LocalContentColor.current.copy(
-                                alpha = ContentAlpha.disabled
-                            )
+                            tint = color
                         )
                     }
                 }

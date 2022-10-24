@@ -67,6 +67,7 @@ fun ProfileScreen(
                         navController.navigate(event.destination.route)
                     }
                 }
+
                 is UiEvent.ShowBottomSheet -> Unit
             }
         }
@@ -134,7 +135,11 @@ fun ProfileScreen(
                     )
                 }
                 IconButton(
-                    onClick = { navController.navigate(EditProfileScreenDestination(user!!).route) },
+                    onClick = {
+                        navController.navigate(
+                            EditProfileScreenDestination(user!!).route
+                        )
+                    },
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Icon(
@@ -150,7 +155,9 @@ fun ProfileScreen(
                 icon = R.drawable.ic_change_password,
                 text = stringResource(R.string.change_password),
                 onClick = {
-                    navController.navigate(EditPasswordScreenDestination(user?.username.orEmpty()).route)
+                    navController.navigate(
+                        EditPasswordScreenDestination(user?.username.orEmpty()).route
+                    )
                 }
             )
             Spacer(modifier = Modifier.height(24.dp))

@@ -13,10 +13,10 @@ import com.jefisu.chatapp.features_profile.domain.model.Password
 import com.jefisu.chatapp.features_profile.domain.use_cases.ProfileUseCase
 import com.jefisu.chatapp.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class EditPasswordViewModel @Inject constructor(
@@ -55,7 +55,8 @@ class EditPasswordViewModel @Inject constructor(
                 newPassword = state.newPassword
             )
 
-            val validatePassword = ValidateUtil.validatePassword(state.newPassword, state.repeatNewPassword)
+            val validatePassword =
+                ValidateUtil.validatePassword(state.newPassword, state.repeatNewPassword)
             if (!validatePassword.successful) {
                 state = state.copy(
                     error = validatePassword.errorMessage

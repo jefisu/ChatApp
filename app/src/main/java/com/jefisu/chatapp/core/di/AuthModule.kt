@@ -17,7 +17,6 @@ import io.ktor.client.HttpClient
 @InstallIn(ViewModelComponent::class)
 object AuthModule {
 
-
     @Provides
     @ViewModelScoped
     fun provideAuthUseCases(

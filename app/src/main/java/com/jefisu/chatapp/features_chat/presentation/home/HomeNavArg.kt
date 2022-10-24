@@ -8,4 +8,4 @@ import kotlinx.parcelize.Parcelize
 data class HomeNavArg(
     val chatId: String?,
     val messages: ArrayList<Message>
-): Parcelable
+) : Parcelable

@@ -13,10 +13,10 @@ import com.jefisu.chatapp.core.validate.ValidateUtil
 import com.jefisu.chatapp.features_profile.domain.use_cases.ProfileUseCase
 import com.jefisu.chatapp.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(

@@ -12,13 +12,13 @@ import com.jefisu.chatapp.features_chat.domain.model.Chat
 import com.jefisu.chatapp.features_chat.domain.model.Message
 import com.jefisu.chatapp.features_chat.domain.use_cases.ChatUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -55,9 +55,9 @@ class HomeViewModel @Inject constructor(
                 messages = chat.messages.toMutableList() as ArrayList<Message>
             )
         }.filter { chat ->
-            chat.lastMessage?.text?.contains(searchQuery, true) ?: false
-                    || chat.recipientUser?.name?.contains(searchQuery, true) ?: false
-                    || chat.recipientUser?.username?.contains(searchQuery, true) ?: false
+            chat.lastMessage?.text?.contains(searchQuery, true) ?: false ||
+                chat.recipientUser?.name?.contains(searchQuery, true) ?: false ||
+                chat.recipientUser?.username?.contains(searchQuery, true) ?: false
         }
         HomeState(
             searchQuery = searchQuery,

@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                         dependency(lifecycle)
                         dependency(rememberCoroutineScope())
                         dependency(
-                            rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+                            rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
                         )
                     }
                 )

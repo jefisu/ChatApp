@@ -1,6 +1,5 @@
 package com.jefisu.chatapp.features_chat.presentation.chat.components
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -64,7 +63,11 @@ fun ChatBubble(
         targetValue = if (isSelected) Color.White.copy(.4f) else Color.Transparent,
         animationSpec = tween(600)
     )
-    val alignAnim by animateAlignmentAsState(if (selectionEnabled || isOwnMessage) Alignment.CenterEnd else Alignment.CenterStart)
+    val alignAnim by animateAlignmentAsState(
+        targetAlignment = if (selectionEnabled || isOwnMessage) {
+            Alignment.CenterEnd
+        } else Alignment.CenterStart
+    )
 
     Box(
         modifier = Modifier
@@ -82,7 +85,6 @@ fun ChatBubble(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .graphicsLayer {
-                        translationX = -8.dp.toPx()
                         translationY = -2.dp.toPx()
                     }
                     .size(24.dp)

@@ -31,9 +31,10 @@ object DateUtil {
         return when {
             currentDate == messageDate -> toHour(timestamp)
             (currentDate - messageDate) == 1 -> "Yesterday"
-            else -> DateFormat
-                .getDateInstance(DateFormat.DATE_FIELD)
-                .format(timestamp)
+            else ->
+                DateFormat
+                    .getDateInstance(DateFormat.DATE_FIELD)
+                    .format(timestamp)
         }
     }
 

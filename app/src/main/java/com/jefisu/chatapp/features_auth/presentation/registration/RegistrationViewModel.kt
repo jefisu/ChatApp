@@ -11,10 +11,10 @@ import com.jefisu.chatapp.core.validate.ValidateUtil
 import com.jefisu.chatapp.destinations.HomeScreenDestination
 import com.jefisu.chatapp.features_auth.domain.use_cases.AuthUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(

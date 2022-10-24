@@ -79,12 +79,16 @@ fun CustomTextField(
             colors = colors,
             placeholder = { Text(text = hint) },
             keyboardOptions = keyboardOptions,
-            visualTransformation = if (showPassword) VisualTransformation.None else visualTransformation,
+            visualTransformation = if (showPassword) {
+                VisualTransformation.None
+            } else visualTransformation,
             trailingIcon = {
                 if (isPassword && text.isNotBlank()) {
                     IconButton(onClick = { showPassword = !showPassword }) {
                         Icon(
-                            imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            imageVector = if (showPassword) {
+                                Icons.Default.VisibilityOff
+                            } else Icons.Default.Visibility,
                             contentDescription = null,
                             tint = Color.White
                         )
