@@ -2,7 +2,7 @@
 
 Chat app built with Jetpack Compose
 
-![](previews/screenshot.png)
+![](previews/app.png)
 
 ## Development Roadmap
 
