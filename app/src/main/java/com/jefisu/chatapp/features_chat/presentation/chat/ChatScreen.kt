@@ -89,6 +89,11 @@ import com.jefisu.chatapp.ui.theme.QuickSilver
 import com.jefisu.chatapp.ui.theme.SkyBlue
 import com.jefisu.chatapp.ui.theme.Woodsmoke
 import com.jefisu.chatapp.ui.theme.heightTopBar
+import com.maxkeppeker.sheets.core.icons.LibIcons
+import com.maxkeppeker.sheets.core.models.base.rememberSheetState
+import com.maxkeppeler.sheets.emoji.EmojiDialog
+import com.maxkeppeler.sheets.emoji.models.EmojiConfig
+import com.maxkeppeler.sheets.emoji.models.EmojiSelection
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.result.ResultBackNavigator
@@ -140,6 +145,7 @@ fun ChatScreen(
     val indicesMessagesLocated = state.messages.indexesOf(state.searchMessageQuery)
     var currentSearchIndex by remember { mutableStateOf(0) }
     val contentColor = LocalContentColor.current
+    val emojiState = rememberSheetState()
 
     LaunchedEffect(key1 = state.selectedMessages, key2 = state.searchMessageQuery) {
         if (state.selectedMessages.isEmpty()) {
@@ -150,6 +156,16 @@ fun ChatScreen(
         }
     }
 
+    EmojiDialog(
+        state = emojiState,
+        selection = EmojiSelection.Unicode(
+            withButtonView = true,
+            onPositiveClick = { emojiUnicode ->
+                viewModel.onEvent(ChatEvent.MessageTextChange(emojiUnicode))
+            }
+        ),
+        config = EmojiConfig(icons = LibIcons.TwoTone)
+    )
     if (showAlert) {
         AlertDialog(
             onDismissRequest = { showAlert = false },
@@ -459,6 +475,7 @@ fun ChatScreen(
                         text = state.messageText,
                         onTextChange = { viewModel.onEvent(ChatEvent.MessageTextChange(it)) },
                         hint = stringResource(R.string.type_a_message),
+                        showEmojis = { emojiState.show() },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
